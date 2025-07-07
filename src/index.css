@@ -1,0 +1,25 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --primary: #007ACC;
+    --secondary: #4CAF50;
+    --accent: #FF6B35;
+    --danger: #F44336;
+    --bg-dark: #1E1E1E;
+    --bg-light: #FFFFFF;
+    --surface: #2D2D30;
+    --code-text: #CCCCCC;
+  }
+
+  * {
+    @apply border-border;
+  }
+  
+  body {
+    @apply bg-bg-light dark:bg-bg-dark text-gray-900 dark:text-gray-100;
+    font-family: system-ui, -apple-system, sans-serif;
+  }
+}
