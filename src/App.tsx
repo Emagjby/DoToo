@@ -1,34 +1,55 @@
 import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
+import TaskForm from './components/TaskForm'
+import Header from './components/layout/Header'
+import EmptyState from './components/layout/EmptyState'
+import TaskGrid from './components/layout/TaskGrid'
+import useTodoStore from './stores/todoStore'
+import type { Task } from './types'
 import './App.css'
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [isFormOpen, setIsFormOpen] = useState(false)
+  const [editingTask, setEditingTask] = useState<Task | undefined>(undefined)
+  const { tasks } = useTodoStore()
+
+  const handleNewTask = () => {
+    setEditingTask(undefined)
+    setIsFormOpen(true)
+  }
+
+  const handleEdit = (task: Task) => {
+    setEditingTask(task)
+    setIsFormOpen(true)
+  }
+
+  const handleCloseForm = () => {
+    setIsFormOpen(false)
+    setEditingTask(undefined)
+  }
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+      <div className="container mx-auto p-6">
+        <Header 
+          onNewTask={handleNewTask}
+          taskCount={tasks.length}
+        />
+
+        {/* Task Content */}
+        {tasks.length > 0 ? (
+          <TaskGrid tasks={tasks} onEdit={handleEdit} />
+        ) : (
+          <EmptyState onNewTask={handleNewTask} />
+        )}
+
+        {/* TaskForm */}
+        <TaskForm
+          task={editingTask}
+          isOpen={isFormOpen}
+          onClose={handleCloseForm}
+        />
       </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
+    </div>
   )
 }
 
