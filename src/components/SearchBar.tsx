@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react'
+import React, { useState, useRef, useEffect, forwardRef } from 'react'
 import { Search, X, Filter, ChevronDown, Tag, AlertTriangle, CheckCircle, Clock, ChevronUp } from 'lucide-react'
 import useTodoStore from '../stores/todoStore'
 import type { Category, Priority, TaskStatus } from '../types'
@@ -30,7 +30,7 @@ interface SearchBarProps {
   onToggleExpanded?: (expanded: boolean) => void
 }
 
-export default function SearchBar({ onToggleExpanded }: SearchBarProps) {
+const SearchBar = forwardRef<HTMLInputElement, SearchBarProps>(({ onToggleExpanded }, ref) => {
   const { searchFilters, setSearchFilters, clearFilters, tasks } = useTodoStore()
   const [isExpanded, setIsExpanded] = useState(false)
   const [isCategoryOpen, setIsCategoryOpen] = useState(false)
@@ -133,6 +133,7 @@ export default function SearchBar({ onToggleExpanded }: SearchBarProps) {
           <div className="relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground" size={20} />
             <input
+              ref={ref}
               type="text"
               placeholder="Search tasks by title, description, or tags..."
               value={searchFilters.query}
@@ -392,4 +393,8 @@ export default function SearchBar({ onToggleExpanded }: SearchBarProps) {
       )}
     </div>
   )
-} 
+})
+
+SearchBar.displayName = 'SearchBar'
+
+export default SearchBar 
