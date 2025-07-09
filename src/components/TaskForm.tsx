@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react'
-import { Plus, Code, Calendar, Tag, AlertTriangle, GitBranch, FileText, Settings, Clock, ChevronDown, Sparkles, Bug, BookOpen, Wrench, TestTube, Scissors, Languages, X, Github } from 'lucide-react'
+import { Plus, Code, Calendar, Tag, AlertTriangle, GitBranch, FileText, Settings, Clock, ChevronDown, Sparkles, Bug, BookOpen, Wrench, TestTube, Scissors, Languages, X, Github, Edit } from 'lucide-react'
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter'
 import { tomorrow } from 'react-syntax-highlighter/dist/esm/styles/prism'
 import Editor from '@monaco-editor/react'
@@ -336,19 +336,44 @@ export default function TaskForm({ task, isOpen, onClose }: TaskFormProps) {
   const currentCategory = categories.find(cat => cat.value === formData.category)
 
   return (
-    <Modal
-      isOpen={isOpen}
-      onClose={onClose}
-      title={task ? 'Edit Task' : 'Create New Task'}
-    >
-      <form onSubmit={handleSubmit} className="space-y-0">
-        {/* Basic Information Section */}
-        <div className="space-y-4 pb-12">
-          <div className="flex items-center gap-2 text-sm font-medium text-foreground">
-            <div className="p-1.5 rounded-md bg-blue-500/10">
-              <FileText size={14} className="text-blue-500" />
+    <div className={`fixed inset-0 z-50 ${isOpen ? 'block' : 'hidden'}`}>
+      <div className="fixed inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose}></div>
+      <div className="fixed inset-0 flex items-center justify-center p-4">
+        <div className="w-full max-w-4xl max-h-[90vh] overflow-hidden">
+          <div className="bg-background border border-border rounded-xl shadow-2xl overflow-hidden">
+            {/* Header */}
+            <div className="flex items-center justify-between border-b border-border px-6 py-4 bg-muted/30">
+              <div className="flex items-center gap-3">
+                <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-primary/10">
+                  {task ? <Edit size={20} className="text-primary" /> : <Plus size={20} className="text-primary" />}
+                </div>
+                <div>
+                  <h2 className="text-lg font-semibold text-foreground">
+                    {task ? 'Edit Task' : 'Create New Task'}
+                  </h2>
+                  <p className="text-sm text-muted-foreground">
+                    {task ? 'Update task details and configuration' : 'Add a new task to your project'}
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={onClose}
+                className="flex items-center justify-center w-8 h-8 rounded-md hover:bg-accent transition-colors"
+              >
+                <X size={16} className="text-muted-foreground" />
+              </button>
             </div>
-            Basic Information
+            
+            {/* Content */}
+            <div className="max-h-[calc(90vh-120px)] overflow-y-auto">
+              <form onSubmit={handleSubmit} className="p-6 space-y-6">
+        {/* Basic Information Section */}
+        <div className="space-y-4">
+          <div className="flex items-center gap-3">
+            <div className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+              Basic Information
+            </div>
+            <div className="h-px flex-1 bg-border"></div>
           </div>
           
           {/* Title */}
@@ -360,7 +385,7 @@ export default function TaskForm({ task, isOpen, onClose }: TaskFormProps) {
               type="text"
               value={formData.title}
               onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-              className="flex h-10 w-full rounded-md border-2 border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:border-primary disabled:cursor-not-allowed disabled:opacity-50"
+              className="flex h-12 w-full rounded-lg border border-border bg-background px-4 py-3 text-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 transition-colors"
               placeholder="Enter task title..."
               required
             />
@@ -375,65 +400,74 @@ export default function TaskForm({ task, isOpen, onClose }: TaskFormProps) {
               value={formData.description}
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
               rows={3}
-              className="flex min-h-[80px] w-full rounded-md border-2 border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:border-primary disabled:cursor-not-allowed disabled:opacity-50"
+              className="flex min-h-[80px] w-full rounded-lg border border-border bg-background px-4 py-3 text-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 transition-colors"
               placeholder="Describe the task..."
             />
           </div>
         </div>
 
         {/* Git Integration Section */}
-        <div className="space-y-4 pb-12">
-          <div className="flex items-center gap-2 text-sm font-medium text-foreground">
-            <div className="p-1.5 rounded-md bg-green-500/10">
-              <Github size={14} className="text-green-500" />
+        <div className="space-y-4">
+          <div className="flex items-center gap-3">
+            <div className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+              Git Integration
             </div>
-            Git Integration
+            <div className="h-px flex-1 bg-border"></div>
           </div>
 
           {/* Branch Name */}
           <div className="space-y-3">
             {/* Branch Type Toggle */}
-            <div className="flex items-center gap-4">
+            <div className="grid grid-cols-2 gap-3">
               <button
                 type="button"
                 onClick={() => setUseCustomBranch(false)}
-                className={`flex items-center gap-2 px-3 py-2 rounded-md border-2 text-sm transition-all duration-200 ${
+                className={`flex items-center gap-3 px-4 py-3 rounded-lg border text-sm transition-colors ${
                   !useCustomBranch
-                    ? 'border-green-500 bg-green-500/20 text-green-400 shadow-sm'
-                    : 'border-gray-600 bg-gray-800 text-gray-300 hover:border-gray-500 hover:bg-gray-700'
+                    ? 'border-primary bg-primary/10 text-primary shadow-sm'
+                    : 'border-border bg-background text-foreground hover:bg-accent'
                 }`}
               >
-                <GitBranch size={14} />
-                Auto-generate
+                <div className="flex items-center justify-center w-8 h-8 rounded-md bg-primary/10">
+                  <GitBranch size={16} className="text-primary" />
+                </div>
+                <span className="font-medium">Auto-generate</span>
               </button>
               <button
                 type="button"
                 onClick={() => setUseCustomBranch(true)}
-                className={`flex items-center gap-2 px-3 py-2 rounded-md border-2 text-sm transition-all duration-200 ${
+                className={`flex items-center gap-3 px-4 py-3 rounded-lg border text-sm transition-colors ${
                   useCustomBranch
-                    ? 'border-green-500 bg-green-500/20 text-green-400 shadow-sm'
-                    : 'border-gray-600 bg-gray-800 text-gray-300 hover:border-gray-500 hover:bg-gray-700'
+                    ? 'border-primary bg-primary/10 text-primary shadow-sm'
+                    : 'border-border bg-background text-foreground hover:bg-accent'
                 }`}
               >
-                <Tag size={14} />
-                Custom
+                <div className="flex items-center justify-center w-8 h-8 rounded-md bg-primary/10">
+                  <Tag size={16} className="text-primary" />
+                </div>
+                <span className="font-medium">Custom</span>
               </button>
             </div>
 
             {/* Branch Name Display/Input */}
             {!useCustomBranch ? (
-              <div className="flex items-center gap-2">
-                <span className="text-sm text-gray-300">Branch:</span>
-                <code className="text-sm bg-gray-700 px-2 py-1 rounded font-mono border border-gray-600 text-gray-200">
-                  {suggestedBranch || 'Enter title to generate...'}
-                </code>
+              <div className="flex items-center gap-3 p-4 rounded-lg bg-muted/30 border border-border">
+                <div className="flex items-center justify-center w-8 h-8 rounded-md bg-muted">
+                  <GitBranch size={16} className="text-muted-foreground" />
+                </div>
+                <div className="flex-1">
+                  <span className="text-sm text-muted-foreground">Branch:</span>
+                  <code className="block text-sm font-mono text-foreground mt-1">
+                    {suggestedBranch || 'Enter title to generate...'}
+                  </code>
+                </div>
               </div>
             ) : (
               <input
                 type="text"
                 value={formData.branchName}
                 onChange={(e) => setFormData({ ...formData, branchName: e.target.value })}
-                className="flex h-10 w-full rounded-md border-2 border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:border-primary disabled:cursor-not-allowed disabled:opacity-50 font-mono"
+                className="flex h-12 w-full rounded-lg border border-border bg-background px-4 py-3 text-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 font-mono transition-colors"
                 placeholder="feature/custom-branch-name"
               />
             )}
@@ -441,18 +475,18 @@ export default function TaskForm({ task, isOpen, onClose }: TaskFormProps) {
         </div>
 
         {/* Task Configuration Section */}
-        <div className="space-y-4 pb-12">
-          <div className="flex items-center gap-2 text-sm font-medium text-foreground">
-            <div className="p-1.5 rounded-md bg-purple-500/10">
-              <Settings size={14} className="text-purple-500" />
+        <div className="space-y-4">
+          <div className="flex items-center gap-3">
+            <div className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+              Task Configuration
             </div>
-            Task Configuration
+            <div className="h-px flex-1 bg-border"></div>
           </div>
 
           {/* Category and Priority */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <label className="block text-sm font-medium text-foreground mb-2">
+              <label className="block text-sm font-medium text-foreground mb-3">
                 Category
               </label>
               <div className="grid grid-cols-2 gap-2">
@@ -461,21 +495,23 @@ export default function TaskForm({ task, isOpen, onClose }: TaskFormProps) {
                     key={cat.value}
                     type="button"
                     onClick={() => setFormData({ ...formData, category: cat.value })}
-                    className={`flex items-center gap-2 px-3 py-2.5 rounded-md border-2 text-sm transition-all duration-200 ${
+                    className={`flex items-center gap-3 px-3 py-2.5 text-sm rounded-lg border transition-colors ${
                       formData.category === cat.value
-                        ? 'border-purple-500 bg-purple-500/20 text-purple-400 shadow-sm'
-                        : 'border-gray-600 bg-gray-800 text-gray-300 hover:border-gray-500 hover:bg-gray-700'
+                        ? 'border-primary bg-primary/10 text-primary shadow-sm'
+                        : 'border-border bg-background text-foreground hover:bg-accent'
                     }`}
                   >
-                    {cat.icon}
-                    {cat.label}
+                    <div className="flex items-center justify-center w-6 h-6 rounded-md bg-primary/10">
+                      {cat.icon}
+                    </div>
+                    <span className="font-medium">{cat.label}</span>
                   </button>
                 ))}
               </div>
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-foreground mb-2">
+              <label className="block text-sm font-medium text-foreground mb-3">
                 Priority
               </label>
               <div className="grid grid-cols-2 gap-2">
@@ -484,14 +520,14 @@ export default function TaskForm({ task, isOpen, onClose }: TaskFormProps) {
                     key={priority.value}
                     type="button"
                     onClick={() => setFormData({ ...formData, priority: priority.value })}
-                    className={`flex items-center gap-2 px-3 py-2 rounded-md border-2 text-sm transition-all duration-200 ${
+                    className={`flex items-center gap-3 px-3 py-2.5 text-sm rounded-lg border transition-colors ${
                       formData.priority === priority.value
-                        ? 'border-purple-500 bg-purple-500/20 text-purple-400 shadow-sm'
-                        : 'border-gray-600 bg-gray-800 text-gray-300 hover:border-gray-500 hover:bg-gray-700'
+                        ? 'border-primary bg-primary/10 text-primary shadow-sm'
+                        : 'border-border bg-background text-foreground hover:bg-accent'
                     }`}
                   >
-                    <span className="text-base">{priority.icon}</span>
-                    {priority.label}
+                    <div className={`w-3 h-3 rounded-full ${priority.color.replace('bg-', 'bg-')}`} />
+                    <span className="font-medium">{priority.label}</span>
                   </button>
                 ))}
               </div>
@@ -504,32 +540,34 @@ export default function TaskForm({ task, isOpen, onClose }: TaskFormProps) {
               Due Date
             </label>
             <div className="relative">
-              <div className="absolute left-3 top-1/2 transform -translate-y-1/2 p-1 rounded bg-orange-500/10">
-                <Clock size={12} className="text-orange-500" />
+              <div className="absolute left-4 top-1/2 transform -translate-y-1/2">
+                <div className="flex items-center justify-center w-6 h-6 rounded-md bg-primary/10">
+                  <Clock size={14} className="text-primary" />
+                </div>
               </div>
               <input
                 type="date"
                 value={formData.dueDate}
                 onChange={(e) => setFormData({ ...formData, dueDate: e.target.value })}
-                className="flex h-10 w-full rounded-md border-2 border-input bg-background pl-12 pr-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:border-primary disabled:cursor-not-allowed disabled:opacity-50"
+                className="flex h-12 w-full rounded-lg border border-border bg-background pl-12 pr-4 py-3 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 transition-colors"
               />
             </div>
           </div>
         </div>
 
         {/* Code Snippet */}
-        <div className="space-y-3">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <Code className="w-4 h-4 text-blue-400" />
-              <h3 className="text-sm font-medium text-gray-100">Code Snippet</h3>
+        <div className="space-y-4">
+          <div className="flex items-center gap-3">
+            <div className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+              Code Snippet
             </div>
+            <div className="h-px flex-1 bg-border"></div>
             <button
               type="button"
               onClick={() => {
                 setCode('');
               }}
-              className="flex items-center gap-1 px-2 py-1 text-xs text-gray-400 hover:text-gray-100 hover:bg-gray-700 rounded transition-colors"
+              className="flex items-center gap-1 px-2 py-1 text-xs text-muted-foreground hover:text-foreground hover:bg-accent rounded transition-colors"
             >
               <X className="w-3 h-3" />
               Clear
@@ -542,34 +580,38 @@ export default function TaskForm({ task, isOpen, onClose }: TaskFormProps) {
               <button
                 type="button"
                 onClick={() => setShowLanguageDropdown(!showLanguageDropdown)}
-                className="w-full flex items-center justify-between px-3 py-2 bg-gray-800 border border-gray-600 rounded-md text-sm text-gray-100 hover:bg-gray-700 transition-colors"
+                className="w-full flex items-center justify-between px-4 py-3 bg-background border border-border rounded-lg text-sm text-foreground hover:bg-accent transition-colors"
               >
-                <div className="flex items-center gap-2">
-                  <Languages className="w-4 h-4" />
-                  <span>{selectedLanguage}</span>
+                <div className="flex items-center gap-3">
+                  <div className="flex items-center justify-center w-8 h-8 rounded-md bg-primary/10">
+                    <Languages size={16} className="text-primary" />
+                  </div>
+                  <span className="font-medium">{selectedLanguage}</span>
                 </div>
-                <ChevronDown className="w-4 h-4" />
+                <ChevronDown className="w-4 h-4 text-muted-foreground" />
               </button>
               
               {showLanguageDropdown && (
-                              <div className="absolute top-full left-0 right-0 mt-1 bg-gray-800 border border-gray-600 rounded-md shadow-lg z-10 max-h-48 overflow-y-auto">
-                {languages.map((lang) => (
-                  <button
-                    key={lang.value}
-                    type="button"
-                    onClick={() => {
-                      setSelectedLanguage(lang.label);
-                      setShowLanguageDropdown(false);
-                    }}
-                    className="w-full flex items-center gap-2 px-3 py-2 text-sm text-gray-100 hover:bg-gray-700 transition-colors"
-                  >
-                    <div className={`${getLanguageInfo(lang.label).color}`}>
-                      {getLanguageInfo(lang.label).icon}
-                    </div>
-                    <span>{lang.label}</span>
-                  </button>
-                ))}
-              </div>
+                <div className="absolute top-full left-0 right-0 mt-1 bg-background border border-border rounded-lg shadow-lg z-10 max-h-48 overflow-y-auto">
+                  {languages.map((lang) => (
+                    <button
+                      key={lang.value}
+                      type="button"
+                      onClick={() => {
+                        setSelectedLanguage(lang.label);
+                        setShowLanguageDropdown(false);
+                      }}
+                      className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-foreground hover:bg-accent transition-colors"
+                    >
+                      <div className="flex items-center justify-center w-6 h-6 rounded-md bg-primary/10">
+                        <div className={`${getLanguageInfo(lang.label).color}`}>
+                          {getLanguageInfo(lang.label).icon}
+                        </div>
+                      </div>
+                      <span className="font-medium">{lang.label}</span>
+                    </button>
+                  ))}
+                </div>
               )}
             </div>
             
@@ -583,23 +625,27 @@ export default function TaskForm({ task, isOpen, onClose }: TaskFormProps) {
         </div>
 
         {/* Actions */}
-        <div className="flex justify-end gap-3 pt-6">
-          <Button
+        <div className="flex justify-end gap-3 pt-6 border-t border-border">
+          <button
             type="button"
-            variant="outline"
             onClick={onClose}
+            className="flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg border border-border bg-background text-foreground hover:bg-accent transition-colors"
           >
             Cancel
-          </Button>
-          <Button
+          </button>
+          <button
             type="submit"
-            className="gap-2 shadow-md hover:shadow-lg transition-all duration-200"
+            className="flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 transition-colors shadow-sm"
           >
-            <Plus size={16} />
+            {task ? <Edit size={16} /> : <Plus size={16} />}
             {task ? 'Update Task' : 'Create Task'}
-          </Button>
+          </button>
         </div>
-      </form>
-    </Modal>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   )
 } 
