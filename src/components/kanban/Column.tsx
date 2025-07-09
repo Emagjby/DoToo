@@ -19,7 +19,7 @@ const columnTitles = {
 }
 
 export default function Column({ id, title, tasks, onEdit }: ColumnProps) {
-  const { setNodeRef } = useDroppable({
+  const { setNodeRef, isOver } = useDroppable({
     id,
   })
 
@@ -40,11 +40,16 @@ export default function Column({ id, title, tasks, onEdit }: ColumnProps) {
       {/* Column Content */}
       <div
         ref={setNodeRef}
-        className="flex-1 p-4 border-2 border-border bg-muted/30 rounded-md min-h-[400px] transition-colors hover:border-border/80"
+        className={`flex-1 p-4 border-2 rounded-md min-h-[400px] transition-colors ${
+          isOver 
+            ? 'border-primary bg-primary/5' 
+            : 'border-border bg-muted/30 hover:border-border/80'
+        }`}
+        data-column-id={id}
       >
         {tasks.length === 0 ? (
           <div className="flex items-center justify-center h-full">
-            <p className="text-sm text-muted-foreground">No tasks</p>
+            <p className="text-sm text-muted-foreground">Drop tasks here</p>
           </div>
         ) : (
           <SortableContext items={tasks.map(task => task.id)} strategy={verticalListSortingStrategy}>

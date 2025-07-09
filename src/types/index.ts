@@ -35,6 +35,10 @@ export interface SearchFilters {
   category?: Category
   priority?: Priority
   status?: TaskStatus
+  tags?: string[]
+  hasCode?: boolean
+  hasDueDate?: boolean
+  isOverdue?: boolean
 }
 
 export interface ThemeConfig {

@@ -3,6 +3,9 @@ import TaskForm from './components/TaskForm'
 import Header from './components/layout/Header'
 import EmptyState from './components/layout/EmptyState'
 import Board from './components/kanban/Board'
+import SearchBar from './components/SearchBar'
+import SearchResults from './components/SearchResults'
+import TaskStats from './components/TaskStats'
 import useTodoStore from './stores/todoStore'
 import type { Task } from './types'
 import './App.css'
@@ -10,7 +13,8 @@ import './App.css'
 function App() {
   const [isFormOpen, setIsFormOpen] = useState(false)
   const [editingTask, setEditingTask] = useState<Task | undefined>(undefined)
-  const { tasks, isDarkMode } = useTodoStore()
+  const [isSearchExpanded, setIsSearchExpanded] = useState(false)
+  const { tasks, filteredTasks, isDarkMode } = useTodoStore()
 
   // Apply dark mode to document
   useEffect(() => {
@@ -41,11 +45,19 @@ function App() {
       {/* Top Navigation Bar */}
       <Header 
         onNewTask={handleNewTask}
+        taskCount={tasks.length}
       />
 
       {/* Main Content Area */}
-      <main className="flex-1 px-6 py-8">
-        <div className="max-w-7xl mx-auto">
+      <main className="flex-1 px-6 py-6">
+        <div className="max-w-7xl mx-auto space-y-4">
+          {/* Search and Filters */}
+          <SearchBar onToggleExpanded={setIsSearchExpanded} />
+          
+          {/* Task Statistics */}
+          <TaskStats isSearchExpanded={isSearchExpanded} />
+          
+          {/* Task Board */}
           {tasks.length > 0 ? (
             <Board onEdit={handleEdit} />
           ) : (

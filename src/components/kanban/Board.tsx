@@ -17,7 +17,7 @@ interface BoardProps {
 }
 
 export default function Board({ onEdit }: BoardProps) {
-  const { tasks, updateTaskStatus } = useTodoStore()
+  const { filteredTasks, updateTaskStatus } = useTodoStore()
   const [activeTask, setActiveTask] = useState<Task | null>(null)
 
   const sensors = useSensors(
@@ -29,7 +29,7 @@ export default function Board({ onEdit }: BoardProps) {
   )
 
   const handleDragStart = (event: DragStartEvent) => {
-    const task = tasks.find(t => t.id === event.active.id)
+    const task = filteredTasks().find(t => t.id === event.active.id)
     if (task) {
       setActiveTask(task)
     }
@@ -40,9 +40,20 @@ export default function Board({ onEdit }: BoardProps) {
 
     if (over && active.id !== over.id) {
       const taskId = active.id as string
-      const newStatus = over.id as 'todo' | 'doing' | 'done'
       
-      updateTaskStatus(taskId, newStatus)
+      // Check if the drop target is a valid column
+      const validColumns = ['todo', 'doing', 'done']
+      if (validColumns.includes(over.id as string)) {
+        const newStatus = over.id as 'todo' | 'doing' | 'done'
+        updateTaskStatus(taskId, newStatus)
+      }
+      // If dropping on another task, find the column that contains that task
+      else {
+        const targetTask = filteredTasks().find(t => t.id === over.id)
+        if (targetTask) {
+          updateTaskStatus(taskId, targetTask.status)
+        }
+      }
     }
 
     setActiveTask(null)
@@ -55,9 +66,9 @@ export default function Board({ onEdit }: BoardProps) {
   }
 
   // Group tasks by status
-  const todoTasks = tasks.filter(task => task.status === 'todo')
-  const doingTasks = tasks.filter(task => task.status === 'doing')
-  const doneTasks = tasks.filter(task => task.status === 'done')
+  const todoTasks = filteredTasks().filter(task => task.status === 'todo')
+  const doingTasks = filteredTasks().filter(task => task.status === 'doing')
+  const doneTasks = filteredTasks().filter(task => task.status === 'done')
 
   return (
     <div className="h-full">

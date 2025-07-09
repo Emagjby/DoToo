@@ -78,7 +78,16 @@ const useTodoStore = create<TodoState>()(
       },
       
       clearFilters: () => {
-        set({ searchFilters: { query: '' } })
+        set({ searchFilters: { 
+          query: '', 
+          category: undefined, 
+          priority: undefined, 
+          status: undefined,
+          tags: undefined,
+          hasCode: undefined,
+          hasDueDate: undefined,
+          isOverdue: undefined
+        } })
       },
       
       setSelectedTask: (task) => set({ selectedTask: task }),
@@ -97,15 +106,43 @@ const useTodoStore = create<TodoState>()(
       filteredTasks: () => {
         const { tasks, searchFilters } = get()
         return tasks.filter((task) => {
-          const matchesQuery = !searchFilters.query || 
-            task.title.toLowerCase().includes(searchFilters.query.toLowerCase()) ||
-            task.description?.toLowerCase().includes(searchFilters.query.toLowerCase())
+          // Text search across title, description, and tags
+          const matchesQuery = !searchFilters.query || (() => {
+            const query = searchFilters.query.toLowerCase()
+            const searchableText = [
+              task.title.toLowerCase(),
+              task.description?.toLowerCase() || '',
+              task.tags?.join(' ').toLowerCase() || '',
+              task.branchName?.toLowerCase() || ''
+            ].join(' ')
+            return searchableText.includes(query)
+          })()
           
           const matchesCategory = !searchFilters.category || task.category === searchFilters.category
           const matchesPriority = !searchFilters.priority || task.priority === searchFilters.priority
           const matchesStatus = !searchFilters.status || task.status === searchFilters.status
           
-          return matchesQuery && matchesCategory && matchesPriority && matchesStatus
+          // Tag filtering
+          const matchesTags = !searchFilters.tags || searchFilters.tags.length === 0 || 
+            searchFilters.tags.some(tag => task.tags?.includes(tag))
+          
+          // Code filtering
+          const matchesHasCode = searchFilters.hasCode === undefined || 
+            (searchFilters.hasCode ? !!task.code : !task.code)
+          
+          // Due date filtering
+          const matchesHasDueDate = searchFilters.hasDueDate === undefined || 
+            (searchFilters.hasDueDate ? !!task.dueDate : !task.dueDate)
+          
+          // Overdue filtering
+          const matchesIsOverdue = searchFilters.isOverdue === undefined || (() => {
+            if (!searchFilters.isOverdue) return true
+            if (!task.dueDate) return false
+            return new Date(task.dueDate) < new Date() && task.status !== 'done'
+          })()
+          
+          return matchesQuery && matchesCategory && matchesPriority && matchesStatus && 
+                 matchesTags && matchesHasCode && matchesHasDueDate && matchesIsOverdue
         })
       },
       
