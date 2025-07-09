@@ -1,8 +1,8 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import TaskForm from './components/TaskForm'
 import Header from './components/layout/Header'
 import EmptyState from './components/layout/EmptyState'
-import TaskGrid from './components/layout/TaskGrid'
+import Board from './components/kanban/Board'
 import useTodoStore from './stores/todoStore'
 import type { Task } from './types'
 import './App.css'
@@ -10,7 +10,16 @@ import './App.css'
 function App() {
   const [isFormOpen, setIsFormOpen] = useState(false)
   const [editingTask, setEditingTask] = useState<Task | undefined>(undefined)
-  const { tasks } = useTodoStore()
+  const { tasks, isDarkMode } = useTodoStore()
+
+  // Apply dark mode to document
+  useEffect(() => {
+    if (isDarkMode) {
+      document.documentElement.classList.add('dark')
+    } else {
+      document.documentElement.classList.remove('dark')
+    }
+  }, [isDarkMode])
 
   const handleNewTask = () => {
     setEditingTask(undefined)
@@ -28,27 +37,29 @@ function App() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      <div className="container mx-auto p-6">
-        <Header 
-          onNewTask={handleNewTask}
-          taskCount={tasks.length}
-        />
+    <div className="min-h-screen bg-background">
+      {/* Top Navigation Bar */}
+      <Header 
+        onNewTask={handleNewTask}
+      />
 
-        {/* Task Content */}
-        {tasks.length > 0 ? (
-          <TaskGrid tasks={tasks} onEdit={handleEdit} />
-        ) : (
-          <EmptyState onNewTask={handleNewTask} />
-        )}
+      {/* Main Content Area */}
+      <main className="flex-1 px-6 py-8">
+        <div className="max-w-7xl mx-auto">
+          {tasks.length > 0 ? (
+            <Board onEdit={handleEdit} />
+          ) : (
+            <EmptyState onNewTask={handleNewTask} />
+          )}
+        </div>
+      </main>
 
-        {/* TaskForm */}
-        <TaskForm
-          task={editingTask}
-          isOpen={isFormOpen}
-          onClose={handleCloseForm}
-        />
-      </div>
+      {/* TaskForm */}
+      <TaskForm
+        task={editingTask}
+        isOpen={isFormOpen}
+        onClose={handleCloseForm}
+      />
     </div>
   )
 }
