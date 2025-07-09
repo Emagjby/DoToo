@@ -1,7 +1,6 @@
 import React, { useState } from 'react'
 import { Edit, Trash2, Code, Calendar, Tag, AlertTriangle, Copy, Check } from 'lucide-react'
-import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter'
-import { tomorrow } from 'react-syntax-highlighter/dist/esm/styles/prism'
+import Editor from '@monaco-editor/react'
 import useTodoStore from '../stores/todoStore'
 import type { Task, Category, Priority } from '../types'
 import { formatDate, generateBranchName } from '../lib/utils'
@@ -28,8 +27,34 @@ const priorityConfig: Record<Priority, { label: string; color: string; bgColor: 
   critical: { label: 'Critical', color: 'text-red-700', bgColor: 'bg-red-100', icon: <AlertTriangle size={12} /> },
 }
 
+// Map language names to Monaco language IDs
+const getMonacoLanguage = (language: string): string => {
+  const languageMap: { [key: string]: string } = {
+    'JavaScript': 'javascript',
+    'TypeScript': 'typescript',
+    'Python': 'python',
+    'Java': 'java',
+    'C++': 'cpp',
+    'C#': 'csharp',
+    'PHP': 'php',
+    'Ruby': 'ruby',
+    'Go': 'go',
+    'Rust': 'rust',
+    'Swift': 'swift',
+    'Kotlin': 'kotlin',
+    'HTML': 'html',
+    'CSS': 'css',
+    'SQL': 'sql',
+    'Bash': 'bash',
+    'JSON': 'json',
+    'YAML': 'yaml',
+    'Markdown': 'markdown',
+  }
+  return languageMap[language] || 'javascript'
+}
+
 export default function TaskCard({ task, onEdit }: TaskCardProps) {
-  const { deleteTask } = useTodoStore()
+  const { deleteTask, isDarkMode } = useTodoStore()
   const [showCode, setShowCode] = useState(false)
   const [copied, setCopied] = useState(false)
   const [copiedBranch, setCopiedBranch] = useState(false)
@@ -159,20 +184,28 @@ export default function TaskCard({ task, onEdit }: TaskCardProps) {
               )}
             </div>
             {showCode && (
-              <div className="relative">
-                <SyntaxHighlighter
-                  language={task.language || 'javascript'}
-                  style={tomorrow}
-                  customStyle={{
-                    margin: 0,
-                    fontSize: '11px',
-                    borderRadius: '4px',
-                    maxHeight: '200px',
-                    border: '1px solid hsl(var(--border))',
+              <div className="relative border border-border rounded-lg overflow-hidden">
+                <Editor
+                  height="200px"
+                  language={getMonacoLanguage(task.language || 'JavaScript')}
+                  value={task.code}
+                  options={{
+                    readOnly: true,
+                    minimap: { enabled: false },
+                    scrollBeyondLastLine: false,
+                    fontSize: 11,
+                    lineNumbers: 'on',
+                    folding: true,
+                    wordWrap: 'on',
+                    theme: isDarkMode ? 'vs-dark' : 'vs',
+                    contextmenu: false,
+                    quickSuggestions: false,
+                    suggestOnTriggerCharacters: false,
+                    parameterHints: { enabled: false },
+                    hover: { enabled: false },
                   }}
-                >
-                  {task.code}
-                </SyntaxHighlighter>
+                  theme={isDarkMode ? 'vs-dark' : 'vs'}
+                />
               </div>
             )}
           </div>
