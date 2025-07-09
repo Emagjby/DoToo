@@ -15,7 +15,11 @@ import {
   Calendar,
   CheckCircle,
   Clock,
-  AlertTriangle
+  AlertTriangle,
+  Database,
+  Download,
+  Upload,
+  Save
 } from 'lucide-react'
 import useTodoStore from '../stores/todoStore'
 import type { Task, Category, Priority, TaskStatus } from '../types'
@@ -23,6 +27,7 @@ import type { Task, Category, Priority, TaskStatus } from '../types'
 interface CommandPaletteProps {
   isOpen: boolean
   onClose: () => void
+  onOpenDataManagement: () => void
 }
 
 const categoryOptions = [
@@ -47,7 +52,7 @@ const statusOptions = [
   { value: 'done', label: 'Done', icon: CheckCircle },
 ] as const
 
-export default function CommandPalette({ isOpen, onClose }: CommandPaletteProps) {
+export default function CommandPalette({ isOpen, onClose, onOpenDataManagement }: CommandPaletteProps) {
   const { 
     tasks, 
     isDarkMode, 
@@ -62,24 +67,19 @@ export default function CommandPalette({ isOpen, onClose }: CommandPaletteProps)
   
   const [search, setSearch] = useState('')
 
-  // Close on escape
-  useEffect(() => {
-    const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        onClose()
-      }
-    }
+  // Note: Escape handling is now done globally in App.tsx
 
-    if (isOpen) {
-      document.addEventListener('keydown', handleEscape)
-      return () => document.removeEventListener('keydown', handleEscape)
-    }
-  }, [isOpen, onClose])
-
-  // Reset search when opening
+  // Reset search when opening and focus the input
   useEffect(() => {
     if (isOpen) {
       setSearch('')
+      // Focus the search input after a short delay to ensure the modal is rendered
+      setTimeout(() => {
+        const searchInput = document.querySelector('[data-command-palette-search]') as HTMLInputElement
+        if (searchInput) {
+          searchInput.focus()
+        }
+      }, 100)
     }
   }, [isOpen])
 
@@ -91,6 +91,11 @@ export default function CommandPalette({ isOpen, onClose }: CommandPaletteProps)
 
   const handleToggleTheme = () => {
     toggleDarkMode()
+    onClose()
+  }
+
+  const handleOpenDataManagement = () => {
+    onOpenDataManagement()
     onClose()
   }
 
@@ -145,6 +150,7 @@ export default function CommandPalette({ isOpen, onClose }: CommandPaletteProps)
                 onValueChange={setSearch}
                 placeholder="Search commands, tasks, or filters..."
                 className="flex h-12 w-full rounded-md bg-transparent py-3 text-sm outline-none placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50 font-medium"
+                data-command-palette-search
               />
             </div>
             <Command.List className="max-h-[400px] overflow-y-auto p-2">
@@ -182,6 +188,17 @@ export default function CommandPalette({ isOpen, onClose }: CommandPaletteProps)
                   </div>
                   <span className="font-medium">Toggle Theme</span>
                   <span className="ml-auto text-xs text-muted-foreground bg-muted px-2 py-1 rounded">T</span>
+                </Command.Item>
+
+                <Command.Item
+                  onSelect={handleOpenDataManagement}
+                  className="flex items-center gap-3 px-3 py-2.5 text-sm rounded-lg cursor-pointer hover:bg-accent transition-colors mx-2"
+                >
+                  <div className="flex items-center justify-center w-8 h-8 rounded-md bg-primary/10">
+                    <Database size={16} className="text-primary" />
+                  </div>
+                  <span className="font-medium">Data Management</span>
+                  <span className="ml-auto text-xs text-muted-foreground bg-muted px-2 py-1 rounded">D</span>
                 </Command.Item>
               </Command.Group>
 
