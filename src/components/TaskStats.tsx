@@ -1,6 +1,7 @@
 import React from 'react'
-import { BarChart3, Clock, AlertTriangle, CheckCircle } from 'lucide-react'
+import { BarChart3, Clock, AlertTriangle, CheckCircle, Folder } from 'lucide-react'
 import useTodoStore from '../stores/todoStore'
+import useProjectStore from '../stores/projectStore'
 
 interface TaskStatsProps {
   isSearchExpanded: boolean
@@ -8,14 +9,18 @@ interface TaskStatsProps {
 
 export default function TaskStats({ isSearchExpanded }: TaskStatsProps) {
   const { tasks, setSearchFilters } = useTodoStore()
+  const { activeProject } = useProjectStore()
   
-  const totalTasks = tasks.length
-  const todoCount = tasks.filter(task => task.status === 'todo').length
-  const doingCount = tasks.filter(task => task.status === 'doing').length
-  const doneCount = tasks.filter(task => task.status === 'done').length
+  // Filter tasks by active project
+  const projectTasks = activeProject() ? tasks.filter(task => task.projectId === activeProject()?.id) : tasks
   
-  const highPriorityCount = tasks.filter(task => task.priority === 'high' || task.priority === 'critical').length
-  const overdueCount = tasks.filter(task => {
+  const totalTasks = projectTasks.length
+  const todoCount = projectTasks.filter(task => task.status === 'todo').length
+  const doingCount = projectTasks.filter(task => task.status === 'doing').length
+  const doneCount = projectTasks.filter(task => task.status === 'done').length
+  
+  const highPriorityCount = projectTasks.filter(task => task.priority === 'high' || task.priority === 'critical').length
+  const overdueCount = projectTasks.filter(task => {
     if (!task.dueDate) return false
     return new Date(task.dueDate) < new Date() && task.status !== 'done'
   }).length
@@ -37,7 +42,23 @@ export default function TaskStats({ isSearchExpanded }: TaskStatsProps) {
   }
 
   return (
-    <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+    <div className="space-y-3">
+      {/* Project Indicator */}
+      {activeProject() && (
+        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+          <Folder size={14} />
+          <span>Showing stats for:</span>
+          <div className="flex items-center gap-1 px-2 py-1 bg-muted/50 rounded-md">
+            <div 
+              className="w-3 h-3 rounded-sm"
+              style={{ backgroundColor: activeProject()?.color }}
+            />
+            <span className="font-medium">{activeProject()?.name}</span>
+          </div>
+        </div>
+      )}
+      
+      <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
       {/* Total Tasks */}
       <div className="bg-background border border-border rounded-lg p-3">
         <div className="flex items-center gap-2 mb-1">
@@ -94,6 +115,7 @@ export default function TaskStats({ isSearchExpanded }: TaskStatsProps) {
         </div>
         <div className="text-xl font-bold text-red-500">{highPriorityCount}</div>
       </button>
+      </div>
     </div>
   )
 } 

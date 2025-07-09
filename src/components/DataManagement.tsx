@@ -16,9 +16,13 @@ import {
   FileSpreadsheet,
   Settings,
   Shield,
-  Archive
+  Archive,
+  FolderOpen,
+  Folder
 } from 'lucide-react'
-import dataManager, { type DataExport, type DataValidationResult, type BackupInfo } from '../services/dataManager'
+import dataManager, { type DataExport, type DataValidationResult, type BackupInfo, type ProjectExport } from '../services/dataManager'
+import useProjectStore from '../stores/projectStore'
+import useTodoStore from '../stores/todoStore'
 
 interface DataManagementProps {
   isOpen: boolean
@@ -26,12 +30,14 @@ interface DataManagementProps {
 }
 
 export default function DataManagement({ isOpen, onClose }: DataManagementProps) {
-  const [activeTab, setActiveTab] = useState<'export' | 'import' | 'backup' | 'cleanup'>('export')
+  const [activeTab, setActiveTab] = useState<'export' | 'import' | 'backup' | 'cleanup' | 'projects'>('export')
   const [importResult, setImportResult] = useState<DataValidationResult | null>(null)
   const [backups, setBackups] = useState<BackupInfo[]>([])
   const [isLoading, setIsLoading] = useState(false)
   const [showConfirmClear, setShowConfirmClear] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const { activeProject, projects } = useProjectStore()
+  const { tasks } = useTodoStore()
 
   // Load backups on mount
   React.useEffect(() => {
@@ -58,6 +64,58 @@ export default function DataManagement({ isOpen, onClose }: DataManagementProps)
     } catch (error) {
       alert('CSV export failed: ' + (error instanceof Error ? error.message : 'Unknown error'))
     }
+  }
+
+  const handleExportProject = (projectId: string) => {
+    try {
+      const data = dataManager.exportProject(projectId)
+      const project = projects.find(p => p.id === projectId)
+      const filename = `dotoo-project-${project?.name || projectId}-${new Date().toISOString().split('T')[0]}.json`
+      dataManager.downloadFile(JSON.stringify(data, null, 2), filename, 'application/json')
+    } catch (error) {
+      alert('Project export failed: ' + (error instanceof Error ? error.message : 'Unknown error'))
+    }
+  }
+
+  const handleImportProject = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0]
+    if (!file) return
+
+    setIsLoading(true)
+    const reader = new FileReader()
+    
+    reader.onload = (e) => {
+      try {
+        const data = JSON.parse(e.target?.result as string)
+        const result = dataManager.importProject(data)
+        setImportResult(result)
+        
+        if (result.isValid) {
+          // Reload the page to reflect changes
+          setTimeout(() => window.location.reload(), 1500)
+        }
+      } catch (error) {
+        setImportResult({
+          isValid: false,
+          errors: ['Invalid project file'],
+          warnings: [],
+          stats: { totalTasks: 0, validTasks: 0, invalidTasks: 0 }
+        })
+      }
+      setIsLoading(false)
+    }
+
+    reader.onerror = () => {
+      setImportResult({
+        isValid: false,
+        errors: ['Failed to read file'],
+        warnings: [],
+        stats: { totalTasks: 0, validTasks: 0, invalidTasks: 0 }
+      })
+      setIsLoading(false)
+    }
+
+    reader.readAsText(file)
   }
 
   const handleImport = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -103,7 +161,7 @@ export default function DataManagement({ isOpen, onClose }: DataManagementProps)
 
   const handleCreateBackup = () => {
     const name = prompt('Enter backup name (optional):')
-    const backup = dataManager.createBackup(name)
+    const backup = dataManager.createBackup(name || undefined)
     setBackups(dataManager.listBackups())
     alert(`Backup created: ${backup.name}`)
   }
@@ -184,10 +242,14 @@ export default function DataManagement({ isOpen, onClose }: DataManagementProps)
                     <HardDrive size={16} className="text-primary" />
                     <span className="text-sm font-medium text-foreground">Data Statistics</span>
                   </div>
-                  <div className="grid grid-cols-3 gap-4 text-sm">
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
                     <div>
                       <span className="text-muted-foreground">Tasks:</span>
                       <span className="ml-2 font-medium">{getDataStats().taskCount}</span>
+                    </div>
+                    <div>
+                      <span className="text-muted-foreground">Projects:</span>
+                      <span className="ml-2 font-medium">{projects.length}</span>
                     </div>
                     <div>
                       <span className="text-muted-foreground">Storage:</span>
@@ -205,6 +267,7 @@ export default function DataManagement({ isOpen, onClose }: DataManagementProps)
                   {[
                     { id: 'export', label: 'Export', icon: Download },
                     { id: 'import', label: 'Import', icon: Upload },
+                    { id: 'projects', label: 'Projects', icon: Folder },
                     { id: 'backup', label: 'Backup', icon: Save },
                     { id: 'cleanup', label: 'Cleanup', icon: Trash2 }
                   ].map((tab) => {
@@ -356,6 +419,101 @@ export default function DataManagement({ isOpen, onClose }: DataManagementProps)
                           )}
                         </div>
                       )}
+                    </div>
+                  )}
+
+                  {/* Projects Tab */}
+                  {activeTab === 'projects' && (
+                    <div className="space-y-4">
+                      <div className="flex items-center gap-3">
+                        <div className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                          Project Management
+                        </div>
+                        <div className="h-px flex-1 bg-border"></div>
+                      </div>
+
+                      <div className="space-y-4">
+                        {/* Export Projects */}
+                        <div className="p-4 rounded-lg border border-border bg-background">
+                          <div className="flex items-center gap-3 mb-4">
+                            <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-primary/10">
+                              <FolderOpen size={20} className="text-primary" />
+                            </div>
+                            <div>
+                              <div className="font-medium text-foreground">Export Projects</div>
+                              <div className="text-sm text-muted-foreground">Export individual projects with their tasks</div>
+                            </div>
+                          </div>
+                          
+                          <div className="space-y-2">
+                            {projects.length === 0 ? (
+                              <div className="p-4 text-center text-muted-foreground">
+                                <Folder size={32} className="mx-auto mb-2 opacity-50" />
+                                <p className="text-sm">No projects found</p>
+                              </div>
+                            ) : (
+                              projects.map((project) => {
+                                const projectTasks = tasks.filter(task => task.projectId === project.id)
+                                return (
+                                  <div key={project.id} className="flex items-center justify-between p-3 rounded-lg border border-border bg-muted/30">
+                                    <div className="flex items-center gap-3">
+                                      <div 
+                                        className="w-8 h-8 rounded-lg flex items-center justify-center text-white text-sm font-medium"
+                                        style={{ backgroundColor: project.color }}
+                                      >
+                                        {project.icon}
+                                      </div>
+                                      <div>
+                                        <div className="font-medium text-foreground">{project.name}</div>
+                                        <div className="text-sm text-muted-foreground">
+                                          {projectTasks.length} tasks • {project.type}
+                                        </div>
+                                      </div>
+                                    </div>
+                                    <button
+                                      onClick={() => handleExportProject(project.id)}
+                                      className="flex items-center gap-2 px-3 py-1.5 text-sm font-medium rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
+                                    >
+                                      <Download size={16} />
+                                      Export
+                                    </button>
+                                  </div>
+                                )
+                              })
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Import Project */}
+                        <div className="p-4 rounded-lg border border-border bg-background">
+                          <div className="flex items-center gap-3 mb-4">
+                            <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-primary/10">
+                              <Upload size={20} className="text-primary" />
+                            </div>
+                            <div>
+                              <div className="font-medium text-foreground">Import Project</div>
+                              <div className="text-sm text-muted-foreground">Import a project file with its tasks</div>
+                            </div>
+                          </div>
+                          
+                          <input
+                            ref={fileInputRef}
+                            type="file"
+                            accept=".json"
+                            onChange={handleImportProject}
+                            className="hidden"
+                          />
+                          
+                          <button
+                            onClick={() => fileInputRef.current?.click()}
+                            disabled={isLoading}
+                            className="flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 transition-colors disabled:opacity-50"
+                          >
+                            {isLoading ? <RefreshCw size={16} className="animate-spin" /> : <Upload size={16} />}
+                            {isLoading ? 'Importing...' : 'Choose Project File'}
+                          </button>
+                        </div>
+                      </div>
                     </div>
                   )}
 

@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect, forwardRef } from 'react'
-import { Search, X, Filter, ChevronDown, Tag, AlertTriangle, CheckCircle, Clock, ChevronUp } from 'lucide-react'
+import { Search, X, Filter, ChevronDown, Tag, AlertTriangle, CheckCircle, Clock, ChevronUp, Folder } from 'lucide-react'
 import useTodoStore from '../stores/todoStore'
+import useProjectStore from '../stores/projectStore'
 import type { Category, Priority, TaskStatus } from '../types'
 import AdvancedFilters from './AdvancedFilters'
 
@@ -33,6 +34,7 @@ interface SearchBarProps {
 
 const SearchBar = forwardRef<HTMLInputElement, SearchBarProps>(({ onToggleExpanded, onCloseDropdowns }, ref) => {
   const { searchFilters, setSearchFilters, clearFilters, tasks } = useTodoStore()
+  const { activeProject } = useProjectStore()
   const [isExpanded, setIsExpanded] = useState(false)
   const [isCategoryOpen, setIsCategoryOpen] = useState(false)
   const [isPriorityOpen, setIsPriorityOpen] = useState(false)
@@ -126,6 +128,15 @@ const SearchBar = forwardRef<HTMLInputElement, SearchBarProps>(({ onToggleExpand
               <span className="text-sm font-medium text-muted-foreground">
                 {hasActiveFilters ? 'Search & Filters Active' : 'Search & Filters'}
               </span>
+              {activeProject() && (
+                <div className="flex items-center gap-1 px-2 py-1 bg-muted/50 rounded-md">
+                  <div 
+                    className="w-3 h-3 rounded-sm"
+                    style={{ backgroundColor: activeProject()?.color }}
+                  />
+                  <span className="text-xs text-muted-foreground">{activeProject()?.name}</span>
+                </div>
+              )}
               {hasActiveFilters && (
                 <div className="w-2 h-2 bg-primary rounded-full"></div>
               )}
@@ -154,7 +165,11 @@ const SearchBar = forwardRef<HTMLInputElement, SearchBarProps>(({ onToggleExpand
             <input
               ref={ref}
               type="text"
-              placeholder="Search tasks by title, description, or tags..."
+              placeholder={
+                activeProject() 
+                  ? `Search tasks in ${activeProject()?.name} by title, description, or tags...`
+                  : "Search tasks by title, description, or tags..."
+              }
               value={searchFilters.query}
               onChange={handleQueryChange}
               className="w-full pl-10 pr-4 py-3 bg-background border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors"

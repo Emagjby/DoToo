@@ -1,13 +1,21 @@
-import type { Task, SearchFilters } from '../types'
+import type { Task, SearchFilters, Project } from '../types'
 
 export interface DataExport {
   version: string
   exportedAt: string
+  projects: Project[]
   tasks: Task[]
   settings: {
     isDarkMode: boolean
     searchFilters: SearchFilters
   }
+}
+
+export interface ProjectExport {
+  version: string
+  exportedAt: string
+  project: Project
+  tasks: Task[]
 }
 
 export interface DataValidationResult {
@@ -37,18 +45,24 @@ class DataManager {
   // Export data to JSON
   exportData(): DataExport {
     const storageData = localStorage.getItem(this.STORAGE_KEY)
+    const projectStorageData = localStorage.getItem('dotoo-projects')
+    
     if (!storageData) {
       throw new Error('No data found to export')
     }
 
     const parsedData = JSON.parse(storageData)
+    const parsedProjectData = projectStorageData ? JSON.parse(projectStorageData) : { state: { projects: [] } }
+    
     const tasks = parsedData.state?.tasks || []
+    const projects = parsedProjectData.state?.projects || []
     const isDarkMode = parsedData.state?.isDarkMode || true
     const searchFilters = parsedData.state?.searchFilters || { query: '' }
 
     return {
       version: this.CURRENT_VERSION,
       exportedAt: new Date().toISOString(),
+      projects,
       tasks,
       settings: {
         isDarkMode,
@@ -85,6 +99,23 @@ class DataManager {
 
       localStorage.setItem(this.STORAGE_KEY, JSON.stringify(updatedData))
       
+      // Update project data if present
+      if (data.projects && data.projects.length > 0) {
+        const currentProjectData = localStorage.getItem('dotoo-projects')
+        const parsedProjectCurrent = currentProjectData ? JSON.parse(currentProjectData) : { state: { projects: [], activeProjectId: null } }
+        
+        const updatedProjectData = {
+          ...parsedProjectCurrent,
+          state: {
+            ...parsedProjectCurrent.state,
+            projects: data.projects,
+            activeProjectId: data.projects[0]?.id || null
+          }
+        }
+        
+        localStorage.setItem('dotoo-projects', JSON.stringify(updatedProjectData))
+      }
+      
       return {
         isValid: true,
         errors: [],
@@ -95,6 +126,101 @@ class DataManager {
       return {
         isValid: false,
         errors: [`Import failed: ${error instanceof Error ? error.message : 'Unknown error'}`],
+        warnings: [],
+        stats: { totalTasks: 0, validTasks: 0, invalidTasks: 0 }
+      }
+    }
+  }
+
+  // Export specific project
+  exportProject(projectId: string): ProjectExport {
+    const storageData = localStorage.getItem(this.STORAGE_KEY)
+    const projectStorageData = localStorage.getItem('dotoo-projects')
+    
+    if (!storageData || !projectStorageData) {
+      throw new Error('No data found to export')
+    }
+
+    const parsedData = JSON.parse(storageData)
+    const parsedProjectData = JSON.parse(projectStorageData)
+    
+    const allTasks = parsedData.state?.tasks || []
+    const projects = parsedProjectData.state?.projects || []
+    
+    const project = projects.find((p: Project) => p.id === projectId)
+    if (!project) {
+      throw new Error('Project not found')
+    }
+    
+    const projectTasks = allTasks.filter((task: Task) => task.projectId === projectId)
+
+    return {
+      version: this.CURRENT_VERSION,
+      exportedAt: new Date().toISOString(),
+      project,
+      tasks: projectTasks
+    }
+  }
+
+  // Import project data
+  importProject(data: ProjectExport): DataValidationResult {
+    const validation = this.validateProjectImportData(data)
+    
+    if (!validation.isValid) {
+      return validation
+    }
+
+    try {
+      // Create backup before import
+      this.createBackup('pre-project-import-backup')
+      
+      // Import project
+      const currentProjectData = localStorage.getItem('dotoo-projects')
+      const parsedProjectCurrent = currentProjectData ? JSON.parse(currentProjectData) : { state: { projects: [], activeProjectId: null } }
+      
+      // Check if project already exists
+      const existingProjectIndex = parsedProjectCurrent.state.projects.findIndex((p: Project) => p.id === data.project.id)
+      
+      if (existingProjectIndex >= 0) {
+        // Update existing project
+        parsedProjectCurrent.state.projects[existingProjectIndex] = data.project
+      } else {
+        // Add new project
+        parsedProjectCurrent.state.projects.push(data.project)
+      }
+      
+      localStorage.setItem('dotoo-projects', JSON.stringify(parsedProjectCurrent))
+      
+      // Import tasks
+      const currentData = localStorage.getItem(this.STORAGE_KEY)
+      const parsedCurrent = currentData ? JSON.parse(currentData) : { state: { tasks: [] } }
+      
+      // Remove existing tasks for this project
+      const filteredTasks = parsedCurrent.state.tasks.filter((task: Task) => task.projectId !== data.project.id)
+      
+      // Add new tasks
+      const updatedTasks = [...filteredTasks, ...data.tasks]
+      
+      const updatedData = {
+        ...parsedCurrent,
+        state: {
+          ...parsedCurrent.state,
+          tasks: updatedTasks
+        }
+      }
+
+      localStorage.setItem(this.STORAGE_KEY, JSON.stringify(updatedData))
+      
+      return {
+        isValid: true,
+        errors: [],
+        warnings: validation.warnings,
+        stats: validation.stats
+      }
+    } catch (error) {
+      return {
+        isValid: false,
+        errors: [`Project import failed: ${error instanceof Error ? error.message : 'Unknown error'}`],
         warnings: [],
         stats: { totalTasks: 0, validTasks: 0, invalidTasks: 0 }
       }
@@ -139,6 +265,64 @@ class DataManager {
     // Check for missing settings
     if (!data.settings) {
       warnings.push('Settings are missing, using defaults')
+    }
+
+    return {
+      isValid: errors.length === 0,
+      errors,
+      warnings,
+      stats: {
+        totalTasks: data.tasks.length,
+        validTasks,
+        invalidTasks
+      }
+    }
+  }
+
+  // Validate project import data
+  validateProjectImportData(data: any): DataValidationResult {
+    const errors: string[] = []
+    const warnings: string[] = []
+    
+    // Check basic structure
+    if (!data || typeof data !== 'object') {
+      errors.push('Invalid project data format')
+      return { isValid: false, errors, warnings, stats: { totalTasks: 0, validTasks: 0, invalidTasks: 0 } }
+    }
+
+    if (!data.project || typeof data.project !== 'object') {
+      errors.push('Project data is missing or invalid')
+      return { isValid: false, errors, warnings, stats: { totalTasks: 0, validTasks: 0, invalidTasks: 0 } }
+    }
+
+    if (!data.tasks || !Array.isArray(data.tasks)) {
+      errors.push('Tasks array is missing or invalid')
+      return { isValid: false, errors, warnings, stats: { totalTasks: 0, validTasks: 0, invalidTasks: 0 } }
+    }
+
+    // Validate project
+    const projectErrors = this.validateProject(data.project)
+    if (projectErrors.length > 0) {
+      errors.push(`Project: ${projectErrors.join(', ')}`)
+    }
+
+    // Validate each task
+    let validTasks = 0
+    let invalidTasks = 0
+
+    data.tasks.forEach((task: any, index: number) => {
+      const taskErrors = this.validateTask(task)
+      if (taskErrors.length > 0) {
+        invalidTasks++
+        errors.push(`Task ${index + 1}: ${taskErrors.join(', ')}`)
+      } else {
+        validTasks++
+      }
+    })
+
+    // Check version compatibility
+    if (data.version && data.version !== this.CURRENT_VERSION) {
+      warnings.push(`Data version (${data.version}) differs from current version (${this.CURRENT_VERSION})`)
     }
 
     return {
@@ -205,6 +389,55 @@ class DataManager {
 
     if (task.tags !== undefined && (!Array.isArray(task.tags) || !task.tags.every((tag: any) => typeof tag === 'string'))) {
       errors.push('Invalid tags')
+    }
+
+    return errors
+  }
+
+  // Validate individual project
+  private validateProject(project: any): string[] {
+    const errors: string[] = []
+
+    // Required fields
+    if (!project.id || typeof project.id !== 'string') {
+      errors.push('Missing or invalid ID')
+    }
+
+    if (!project.name || typeof project.name !== 'string') {
+      errors.push('Missing or invalid name')
+    }
+
+    if (!project.type || !['development', 'design', 'marketing', 'research', 'personal', 'other'].includes(project.type)) {
+      errors.push('Missing or invalid type')
+    }
+
+    if (!project.viewType || !['kanban', 'list', 'calendar', 'gantt', 'table', 'mindmap'].includes(project.viewType)) {
+      errors.push('Missing or invalid view type')
+    }
+
+    if (!project.color || typeof project.color !== 'string') {
+      errors.push('Missing or invalid color')
+    }
+
+    if (!project.icon || typeof project.icon !== 'string') {
+      errors.push('Missing or invalid icon')
+    }
+
+    if (!project.createdAt) {
+      errors.push('Missing creation date')
+    }
+
+    if (!project.updatedAt) {
+      errors.push('Missing update date')
+    }
+
+    // Optional field validation
+    if (project.description !== undefined && typeof project.description !== 'string') {
+      errors.push('Invalid description')
+    }
+
+    if (project.settings !== undefined && typeof project.settings !== 'object') {
+      errors.push('Invalid settings')
     }
 
     return errors
@@ -303,6 +536,9 @@ class DataManager {
     // Clear main storage
     localStorage.removeItem(this.STORAGE_KEY)
     
+    // Clear project storage
+    localStorage.removeItem('dotoo-projects')
+    
     // Clear all backups except the one we just created
     const backups = this.listBackups()
     backups.forEach(backup => {
@@ -313,18 +549,24 @@ class DataManager {
   }
 
   // Get data statistics
-  getDataStats(): { taskCount: number; storageSize: number; lastModified: string } {
+  getDataStats(): { taskCount: number; projectCount: number; storageSize: number; lastModified: string } {
     const storageData = localStorage.getItem(this.STORAGE_KEY)
+    const projectStorageData = localStorage.getItem('dotoo-projects')
+    
     if (!storageData) {
-      return { taskCount: 0, storageSize: 0, lastModified: '' }
+      return { taskCount: 0, projectCount: 0, storageSize: 0, lastModified: '' }
     }
 
     const parsedData = JSON.parse(storageData)
+    const parsedProjectData = projectStorageData ? JSON.parse(projectStorageData) : { state: { projects: [] } }
+    
     const tasks = parsedData.state?.tasks || []
+    const projects = parsedProjectData.state?.projects || []
     
     return {
       taskCount: tasks.length,
-      storageSize: storageData.length,
+      projectCount: projects.length,
+      storageSize: storageData.length + (projectStorageData?.length || 0),
       lastModified: parsedData.state?.lastModified || new Date().toISOString()
     }
   }

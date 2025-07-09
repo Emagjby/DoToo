@@ -1,6 +1,7 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import type { Task, TaskStatus, Category, Priority, SearchFilters } from '@/types'
+import useProjectStore from './projectStore'
 
 interface TodoState {
   tasks: Task[]
@@ -40,8 +41,15 @@ const useTodoStore = create<TodoState>()(
       isDarkMode: true, // Developer preference 😎
       
       addTask: (taskData) => {
+        const activeProject = useProjectStore.getState().activeProject()
+        if (!activeProject) {
+          console.warn('No active project to add task to')
+          return
+        }
+        
         const task: Task = {
           ...taskData,
+          projectId: activeProject.id,
           id: crypto.randomUUID(),
           createdAt: new Date(),
         }
@@ -105,7 +113,12 @@ const useTodoStore = create<TodoState>()(
       // Computed getters
       filteredTasks: () => {
         const { tasks, searchFilters } = get()
+        const activeProject = useProjectStore.getState().activeProject()
+        
         return tasks.filter((task) => {
+          // Filter by active project
+          const matchesProject = !activeProject || task.projectId === activeProject.id
+          
           // Text search across title, description, and tags
           const matchesQuery = !searchFilters.query || (() => {
             const query = searchFilters.query.toLowerCase()
@@ -141,8 +154,15 @@ const useTodoStore = create<TodoState>()(
             return new Date(task.dueDate) < new Date() && task.status !== 'done'
           })()
           
-          return matchesQuery && matchesCategory && matchesPriority && matchesStatus && 
-                 matchesTags && matchesHasCode && matchesHasDueDate && matchesIsOverdue
+          // Project filtering
+          const matchesProjectFilter = !searchFilters.projectId || task.projectId === searchFilters.projectId
+          
+          // Assigned to filtering
+          const matchesAssignedTo = !searchFilters.assignedTo || task.assignedTo === searchFilters.assignedTo
+          
+          return matchesProject && matchesQuery && matchesCategory && matchesPriority && matchesStatus && 
+                 matchesTags && matchesHasCode && matchesHasDueDate && matchesIsOverdue && 
+                 matchesProjectFilter && matchesAssignedTo
         })
       },
       

@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import TaskForm from './components/TaskForm'
 import Header from './components/layout/Header'
 import EmptyState from './components/layout/EmptyState'
-import Board from './components/kanban/Board'
+import ViewContainer from './components/views/ViewContainer'
 import SearchBar from './components/SearchBar'
 import SearchResults from './components/SearchResults'
 import TaskStats from './components/TaskStats'
@@ -11,7 +11,9 @@ import KeyboardShortcutsHelp from './components/KeyboardShortcutsHelp'
 import DataManagement from './components/DataManagement'
 import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts'
 import useTodoStore from './stores/todoStore'
+import useProjectStore from './stores/projectStore'
 import type { Task } from './types'
+import { migrateToMultiProject, initializeDefaultProject } from './utils/migration'
 import './App.css'
 import { useRef } from 'react'
 
@@ -22,6 +24,7 @@ function App() {
   const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false)
   const [isDataManagementOpen, setIsDataManagementOpen] = useState(false)
   const { tasks, filteredTasks, isDarkMode, toggleDarkMode } = useTodoStore()
+  const { activeProject } = useProjectStore()
   const searchInputRef = useRef<HTMLInputElement>(null)
 
   // Apply dark mode to document
@@ -32,6 +35,15 @@ function App() {
       document.documentElement.classList.remove('dark')
     }
   }, [isDarkMode])
+
+  // Initialize multi-project system
+  useEffect(() => {
+    // Run migration for existing data
+    migrateToMultiProject()
+    
+    // Initialize default project if none exist
+    initializeDefaultProject()
+  }, [])
 
   const handleNewTask = () => {
     // Close command palette if it's open
@@ -154,9 +166,13 @@ function App() {
           {/* Task Statistics */}
           <TaskStats isSearchExpanded={isSearchExpanded} />
           
-          {/* Task Board */}
-          {tasks.length > 0 ? (
-            <Board onEdit={handleEdit} />
+          {/* Task Views */}
+          {activeProject() ? (
+            tasks.length > 0 ? (
+              <ViewContainer onEdit={handleEdit} />
+            ) : (
+              <EmptyState onNewTask={handleNewTask} />
+            )
           ) : (
             <EmptyState onNewTask={handleNewTask} />
           )}

@@ -19,10 +19,18 @@ import {
   Database,
   Download,
   Upload,
-  Save
+  Save,
+  Folder,
+  FolderOpen,
+  Layout,
+  List,
+  BarChart3,
+  Table,
+  Network
 } from 'lucide-react'
 import useTodoStore from '../stores/todoStore'
-import type { Task, Category, Priority, TaskStatus } from '../types'
+import useProjectStore from '../stores/projectStore'
+import type { Task, Category, Priority, TaskStatus, ViewType } from '../types'
 
 interface CommandPaletteProps {
   isOpen: boolean
@@ -64,6 +72,13 @@ export default function CommandPalette({ isOpen, onClose, onOpenDataManagement }
     selectedTask,
     setSelectedTask
   } = useTodoStore()
+  
+  const { 
+    projects, 
+    activeProject, 
+    setActiveProject, 
+    updateProject 
+  } = useProjectStore()
   
   const [search, setSearch] = useState('')
 
@@ -136,6 +151,25 @@ export default function CommandPalette({ isOpen, onClose, onOpenDataManagement }
     onClose()
   }
 
+  const handleSwitchProject = (projectId: string) => {
+    setActiveProject(projectId)
+    onClose()
+  }
+
+  const handleSwitchView = (viewType: ViewType) => {
+    const currentProject = activeProject()
+    if (currentProject) {
+      updateProject(currentProject.id, { viewType })
+    }
+    onClose()
+  }
+
+  const handleCreateProject = () => {
+    onClose()
+    // Trigger project creation
+    window.dispatchEvent(new CustomEvent('create-project'))
+  }
+
   if (!isOpen) return null
 
   return (
@@ -199,6 +233,103 @@ export default function CommandPalette({ isOpen, onClose, onOpenDataManagement }
                   </div>
                   <span className="font-medium">Data Management</span>
                   <span className="ml-auto text-xs text-muted-foreground bg-muted px-2 py-1 rounded">D</span>
+                </Command.Item>
+              </Command.Group>
+
+              {/* Projects */}
+              {projects.length > 0 && (
+                <Command.Group className="px-3 py-2">
+                  <div className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-3 px-2">
+                    Switch Project
+                  </div>
+                  <div className="h-px bg-border mx-2 mb-3"></div>
+                  {projects.map((project) => {
+                    const isActive = activeProject()?.id === project.id
+                    const projectTasks = tasks.filter(task => task.projectId === project.id)
+                    return (
+                      <Command.Item
+                        key={project.id}
+                        onSelect={() => handleSwitchProject(project.id)}
+                        className={`flex items-center gap-3 px-3 py-2.5 text-sm rounded-lg cursor-pointer hover:bg-accent transition-colors mx-2 ${
+                          isActive ? 'bg-primary/10 border border-primary/20' : ''
+                        }`}
+                      >
+                        <div 
+                          className="w-8 h-8 rounded-lg flex items-center justify-center text-white text-sm font-medium"
+                          style={{ backgroundColor: project.color }}
+                        >
+                          {project.icon}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <span className="font-medium truncate block">{project.name}</span>
+                          <span className="text-xs text-muted-foreground">{projectTasks.length} tasks</span>
+                        </div>
+                        {isActive && (
+                          <span className="text-xs text-primary font-medium">Active</span>
+                        )}
+                      </Command.Item>
+                    )
+                  })}
+                </Command.Group>
+              )}
+
+              {/* View Types */}
+              {activeProject() && (
+                <Command.Group className="px-3 py-2">
+                  <div className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-3 px-2">
+                    Switch View
+                  </div>
+                  <div className="h-px bg-border mx-2 mb-3"></div>
+                  <div className="grid grid-cols-2 gap-2">
+                    {[
+                      { key: 'kanban', label: 'Kanban Board', icon: Layout, color: '#3B82F6' },
+                      { key: 'list', label: 'List View', icon: List, color: '#10B981' },
+                      { key: 'calendar', label: 'Calendar View', icon: Calendar, color: '#F59E0B' },
+                      { key: 'gantt', label: 'Gantt Chart', icon: BarChart3, color: '#8B5CF6' },
+                      { key: 'table', label: 'Table View', icon: Table, color: '#EF4444' },
+                      { key: 'mindmap', label: 'Mind Map', icon: Network, color: '#06B6D4' }
+                    ].map((view) => {
+                      const IconComponent = view.icon
+                      const isActive = activeProject()?.viewType === view.key
+                      return (
+                        <Command.Item
+                          key={view.key}
+                          onSelect={() => handleSwitchView(view.key as ViewType)}
+                          className={`flex items-center gap-2 px-3 py-2 text-sm rounded-lg cursor-pointer hover:bg-accent transition-colors ${
+                            isActive ? 'bg-primary/10 border border-primary/20' : ''
+                          }`}
+                        >
+                          <div 
+                            className="w-6 h-6 rounded-md flex items-center justify-center text-white"
+                            style={{ backgroundColor: view.color }}
+                          >
+                            <IconComponent size={14} />
+                          </div>
+                          <span className="font-medium">{view.label}</span>
+                          {isActive && (
+                            <span className="ml-auto text-xs text-primary font-medium">Active</span>
+                          )}
+                        </Command.Item>
+                      )
+                    })}
+                  </div>
+                </Command.Group>
+              )}
+
+              {/* Create Project */}
+              <Command.Group className="px-3 py-2">
+                <div className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-3 px-2">
+                  Project Management
+                </div>
+                <div className="h-px bg-border mx-2 mb-3"></div>
+                <Command.Item
+                  onSelect={handleCreateProject}
+                  className="flex items-center gap-3 px-3 py-2.5 text-sm rounded-lg cursor-pointer hover:bg-accent transition-colors mx-2"
+                >
+                  <div className="flex items-center justify-center w-8 h-8 rounded-md bg-primary/10">
+                    <FolderOpen size={16} className="text-primary" />
+                  </div>
+                  <span className="font-medium">Create New Project</span>
                 </Command.Item>
               </Command.Group>
 
