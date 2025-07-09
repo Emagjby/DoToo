@@ -1,34 +1,78 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
+import { useState, useEffect } from 'react'
+import TaskForm from './components/TaskForm'
+import Header from './components/layout/Header'
+import EmptyState from './components/layout/EmptyState'
+import Board from './components/kanban/Board'
+import SearchBar from './components/SearchBar'
+import SearchResults from './components/SearchResults'
+import TaskStats from './components/TaskStats'
+import useTodoStore from './stores/todoStore'
+import type { Task } from './types'
 import './App.css'
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [isFormOpen, setIsFormOpen] = useState(false)
+  const [editingTask, setEditingTask] = useState<Task | undefined>(undefined)
+  const [isSearchExpanded, setIsSearchExpanded] = useState(false)
+  const { tasks, filteredTasks, isDarkMode } = useTodoStore()
+
+  // Apply dark mode to document
+  useEffect(() => {
+    if (isDarkMode) {
+      document.documentElement.classList.add('dark')
+    } else {
+      document.documentElement.classList.remove('dark')
+    }
+  }, [isDarkMode])
+
+  const handleNewTask = () => {
+    setEditingTask(undefined)
+    setIsFormOpen(true)
+  }
+
+  const handleEdit = (task: Task) => {
+    setEditingTask(task)
+    setIsFormOpen(true)
+  }
+
+  const handleCloseForm = () => {
+    setIsFormOpen(false)
+    setEditingTask(undefined)
+  }
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
+    <div className="min-h-screen bg-background">
+      {/* Top Navigation Bar */}
+      <Header 
+        onNewTask={handleNewTask}
+        taskCount={tasks.length}
+      />
+
+      {/* Main Content Area */}
+      <main className="flex-1 px-6 py-6">
+        <div className="max-w-7xl mx-auto space-y-4">
+          {/* Search and Filters */}
+          <SearchBar onToggleExpanded={setIsSearchExpanded} />
+          
+          {/* Task Statistics */}
+          <TaskStats isSearchExpanded={isSearchExpanded} />
+          
+          {/* Task Board */}
+          {tasks.length > 0 ? (
+            <Board onEdit={handleEdit} />
+          ) : (
+            <EmptyState onNewTask={handleNewTask} />
+          )}
+        </div>
+      </main>
+
+      {/* TaskForm */}
+      <TaskForm
+        task={editingTask}
+        isOpen={isFormOpen}
+        onClose={handleCloseForm}
+      />
+    </div>
   )
 }
 

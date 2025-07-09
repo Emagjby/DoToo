@@ -13,6 +13,7 @@ export interface Task {
   status: TaskStatus
   createdAt: Date
   dueDate?: Date
+  branchName?: string
   tags?: string[]
 }
 
@@ -34,6 +35,10 @@ export interface SearchFilters {
   category?: Category
   priority?: Priority
   status?: TaskStatus
+  tags?: string[]
+  hasCode?: boolean
+  hasDueDate?: boolean
+  isOverdue?: boolean
 }
 
 export interface ThemeConfig {
