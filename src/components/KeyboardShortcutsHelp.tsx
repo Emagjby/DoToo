@@ -1,7 +1,11 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Keyboard, X } from 'lucide-react'
 
-export default function KeyboardShortcutsHelp() {
+interface KeyboardShortcutsHelpProps {
+  onClose?: () => void
+}
+
+export default function KeyboardShortcutsHelp({ onClose }: KeyboardShortcutsHelpProps) {
   const [isOpen, setIsOpen] = useState(false)
 
   const shortcuts = [
@@ -9,7 +13,8 @@ export default function KeyboardShortcutsHelp() {
     { key: 'N', description: 'Create new task' },
     { key: 'T', description: 'Toggle theme' },
     { key: '/', description: 'Focus search' },
-    { key: 'Esc', description: 'Close modals' },
+    { key: 'D', description: 'Open data management' },
+    { key: 'Esc', description: 'Close all modals & menus' },
   ]
 
   if (!isOpen) {
@@ -52,4 +57,18 @@ export default function KeyboardShortcutsHelp() {
       </div>
     </div>
   )
+
+  // Close when escape is pressed (handled by parent)
+  useEffect(() => {
+    const handleClose = () => {
+      setIsOpen(false)
+    }
+    
+    // Store the handler in a way that parent can call it
+    ;(window as any).closeKeyboardHelp = handleClose
+    
+    return () => {
+      delete (window as any).closeKeyboardHelp
+    }
+  }, [])
 } 

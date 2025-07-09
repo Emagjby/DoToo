@@ -5,6 +5,8 @@ interface KeyboardShortcutsProps {
   onNewTask: () => void
   onToggleTheme: () => void
   onFocusSearch: () => void
+  onOpenDataManagement: () => void
+  onCloseAllModals: () => void
 }
 
 export function useKeyboardShortcuts({
@@ -12,6 +14,8 @@ export function useKeyboardShortcuts({
   onNewTask,
   onToggleTheme,
   onFocusSearch,
+  onOpenDataManagement,
+  onCloseAllModals,
 }: KeyboardShortcutsProps) {
   const handleKeyDown = useCallback(
     (event: KeyboardEvent) => {
@@ -54,13 +58,21 @@ export function useKeyboardShortcuts({
         return
       }
 
-      // Escape - Close modals (handled by individual components)
+      // D - Open data management
+      if (event.key === 'd' && !event.metaKey && !event.ctrlKey && !event.altKey) {
+        event.preventDefault()
+        onOpenDataManagement()
+        return
+      }
+
+      // Escape - Close all modals and menus
       if (event.key === 'Escape') {
-        // This is handled by the CommandPalette component itself
+        event.preventDefault()
+        onCloseAllModals()
         return
       }
     },
-    [onOpenCommandPalette, onNewTask, onToggleTheme, onFocusSearch]
+    [onOpenCommandPalette, onNewTask, onToggleTheme, onFocusSearch, onOpenDataManagement, onCloseAllModals]
   )
 
   useEffect(() => {

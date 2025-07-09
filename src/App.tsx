@@ -8,6 +8,7 @@ import SearchResults from './components/SearchResults'
 import TaskStats from './components/TaskStats'
 import CommandPalette from './components/CommandPalette'
 import KeyboardShortcutsHelp from './components/KeyboardShortcutsHelp'
+import DataManagement from './components/DataManagement'
 import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts'
 import useTodoStore from './stores/todoStore'
 import type { Task } from './types'
@@ -19,6 +20,7 @@ function App() {
   const [editingTask, setEditingTask] = useState<Task | undefined>(undefined)
   const [isSearchExpanded, setIsSearchExpanded] = useState(false)
   const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false)
+  const [isDataManagementOpen, setIsDataManagementOpen] = useState(false)
   const { tasks, filteredTasks, isDarkMode, toggleDarkMode } = useTodoStore()
   const searchInputRef = useRef<HTMLInputElement>(null)
 
@@ -48,6 +50,8 @@ function App() {
   const handleCloseForm = () => {
     setIsFormOpen(false)
     setEditingTask(undefined)
+    // Reset search expanded state when form closes to prevent layout issues
+    setIsSearchExpanded(false)
   }
 
   // Keyboard shortcuts handlers
@@ -57,6 +61,29 @@ function App() {
 
   const handleCloseCommandPalette = () => {
     setIsCommandPaletteOpen(false)
+  }
+
+  const handleCloseAllModals = () => {
+    setIsCommandPaletteOpen(false)
+    setIsDataManagementOpen(false)
+    setIsFormOpen(false)
+    setIsSearchExpanded(false)
+    setEditingTask(undefined)
+    
+    // Close SearchBar dropdowns
+    if ((window as any).closeSearchDropdowns) {
+      (window as any).closeSearchDropdowns()
+    }
+    
+    // Close TaskForm dropdowns
+    if ((window as any).closeTaskFormDropdowns) {
+      (window as any).closeTaskFormDropdowns()
+    }
+    
+    // Close Keyboard Shortcuts Help
+    if ((window as any).closeKeyboardHelp) {
+      (window as any).closeKeyboardHelp()
+    }
   }
 
   const handleFocusSearch = () => {
@@ -79,6 +106,8 @@ function App() {
     onNewTask: handleNewTask,
     onToggleTheme: toggleDarkMode,
     onFocusSearch: handleFocusSearch,
+    onOpenDataManagement: () => setIsDataManagementOpen(true),
+    onCloseAllModals: handleCloseAllModals,
   })
 
   // Listen for custom events from command palette
@@ -100,6 +129,13 @@ function App() {
       window.removeEventListener('edit-task', handleEditTaskEvent as EventListener)
     }
   }, [])
+
+  // Reset search expanded state when tasks array changes from empty to non-empty
+  useEffect(() => {
+    if (tasks.length === 0) {
+      setIsSearchExpanded(false)
+    }
+  }, [tasks.length])
 
   return (
     <div className="min-h-screen bg-background">
@@ -129,7 +165,14 @@ function App() {
         {/* Command Palette */}
         <CommandPalette 
           isOpen={isCommandPaletteOpen} 
-          onClose={handleCloseCommandPalette} 
+          onClose={handleCloseCommandPalette}
+          onOpenDataManagement={() => setIsDataManagementOpen(true)}
+        />
+
+        {/* Data Management */}
+        <DataManagement
+          isOpen={isDataManagementOpen}
+          onClose={() => setIsDataManagementOpen(false)}
         />
 
         {/* Keyboard Shortcuts Help */}

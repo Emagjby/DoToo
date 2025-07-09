@@ -28,9 +28,10 @@ const statusOptions = [
 
 interface SearchBarProps {
   onToggleExpanded?: (expanded: boolean) => void
+  onCloseDropdowns?: () => void
 }
 
-const SearchBar = forwardRef<HTMLInputElement, SearchBarProps>(({ onToggleExpanded }, ref) => {
+const SearchBar = forwardRef<HTMLInputElement, SearchBarProps>(({ onToggleExpanded, onCloseDropdowns }, ref) => {
   const { searchFilters, setSearchFilters, clearFilters, tasks } = useTodoStore()
   const [isExpanded, setIsExpanded] = useState(false)
   const [isCategoryOpen, setIsCategoryOpen] = useState(false)
@@ -40,10 +41,8 @@ const SearchBar = forwardRef<HTMLInputElement, SearchBarProps>(({ onToggleExpand
   const priorityRef = useRef<HTMLDivElement>(null)
   const statusRef = useRef<HTMLDivElement>(null)
 
-  // Don't show search if no tasks
-  if (tasks.length === 0) {
-    return null
-  }
+  // Don't show search content if no tasks, but keep the component mounted
+  const shouldShowSearch = tasks.length > 0
 
   // Close dropdowns when clicking outside
   useEffect(() => {
@@ -62,6 +61,24 @@ const SearchBar = forwardRef<HTMLInputElement, SearchBarProps>(({ onToggleExpand
     document.addEventListener('mousedown', handleClickOutside)
     return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [])
+
+  // Close dropdowns when escape is pressed (handled by parent)
+  useEffect(() => {
+    if (onCloseDropdowns) {
+      const handleCloseDropdowns = () => {
+        setIsCategoryOpen(false)
+        setIsPriorityOpen(false)
+        setIsStatusOpen(false)
+      }
+      
+      // Store the handler in a way that parent can call it
+      ;(window as any).closeSearchDropdowns = handleCloseDropdowns
+      
+      return () => {
+        delete (window as any).closeSearchDropdowns
+      }
+    }
+  }, [onCloseDropdowns])
 
   const handleToggleExpanded = () => {
     const newExpanded = !isExpanded
@@ -98,36 +115,38 @@ const SearchBar = forwardRef<HTMLInputElement, SearchBarProps>(({ onToggleExpand
   return (
     <div className="w-full max-w-4xl mx-auto">
       {/* Compact Search Toggle */}
-      <div className="flex items-center justify-center mb-4">
-        <div className="flex items-center gap-3">
-          <button
-            onClick={handleToggleExpanded}
-            className="mb-4 mt-0 flex items-center gap-3 px-24 py-2 bg-background border border-border rounded-lg hover:border-primary/50 transition-colors min-w-[200px] justify-center"
-          >
-            <Search size={18} className="text-muted-foreground" />
-            <span className="text-sm font-medium text-muted-foreground">
-              {hasActiveFilters ? 'Search & Filters Active' : 'Search & Filters'}
-            </span>
-            {hasActiveFilters && (
-              <div className="w-2 h-2 bg-primary rounded-full"></div>
-            )}
-            {isExpanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
-          </button>
-          
-          {hasActiveFilters && (
+      {shouldShowSearch && (
+        <div className="flex items-center justify-center mb-4">
+          <div className="flex items-center gap-3">
             <button
-              onClick={clearFilters}
-              className="flex items-center gap-1 px-3 py-2 text-sm text-muted-foreground hover:text-foreground transition-colors bg-background border border-border rounded-lg hover:border-primary/50"
+              onClick={handleToggleExpanded}
+              className="mb-4 mt-0 flex items-center gap-3 px-24 py-2 bg-background border border-border rounded-lg hover:border-primary/50 transition-colors min-w-[200px] justify-center"
             >
-              <X size={14} />
-              <span>Clear all</span>
+              <Search size={18} className="text-muted-foreground" />
+              <span className="text-sm font-medium text-muted-foreground">
+                {hasActiveFilters ? 'Search & Filters Active' : 'Search & Filters'}
+              </span>
+              {hasActiveFilters && (
+                <div className="w-2 h-2 bg-primary rounded-full"></div>
+              )}
+              {isExpanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
             </button>
-          )}
+            
+            {hasActiveFilters && (
+              <button
+                onClick={clearFilters}
+                className="flex items-center gap-1 px-3 py-2 text-sm text-muted-foreground hover:text-foreground transition-colors bg-background border border-border rounded-lg hover:border-primary/50"
+              >
+                <X size={14} />
+                <span>Clear all</span>
+              </button>
+            )}
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Expanded Search Content */}
-      {isExpanded && (
+      {shouldShowSearch && isExpanded && (
         <div className="space-y-4">
           {/* Main Search Bar */}
           <div className="relative">

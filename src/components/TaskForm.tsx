@@ -308,6 +308,20 @@ export default function TaskForm({ task, isOpen, onClose }: TaskFormProps) {
     }
   }, [formData.title, useCustomBranch])
 
+  // Close dropdowns when escape is pressed (handled by parent)
+  useEffect(() => {
+    const handleCloseDropdowns = () => {
+      setShowLanguageDropdown(false)
+    }
+    
+    // Store the handler in a way that parent can call it
+    ;(window as any).closeTaskFormDropdowns = handleCloseDropdowns
+    
+    return () => {
+      delete (window as any).closeTaskFormDropdowns
+    }
+  }, [])
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     
@@ -329,7 +343,10 @@ export default function TaskForm({ task, isOpen, onClose }: TaskFormProps) {
       addTask(taskData)
     }
     
-    onClose()
+    // Small delay to ensure state updates are processed
+    setTimeout(() => {
+      onClose()
+    }, 100)
   }
 
   const currentLanguage = languages.find(lang => lang.value === selectedLanguage)

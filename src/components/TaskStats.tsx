@@ -33,7 +33,7 @@ export default function TaskStats({ isSearchExpanded }: TaskStatsProps) {
 
   // Don't show stats if no tasks or search is not expanded
   if (totalTasks === 0 || !isSearchExpanded) {
-    return null
+    return <div className="hidden" /> // Keep component mounted but hidden
   }
 
   return (
