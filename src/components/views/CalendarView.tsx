@@ -238,15 +238,15 @@ export default function CalendarView({ onEdit }: CalendarViewProps) {
     const currentCalendarDate = new Date(startDate)
     
     while (currentCalendarDate <= endDate) {
-      const dayTasks = tasks.filter(task => {
-        if (!task.dueDate) return false
-        const taskDate = new Date(task.dueDate)
-        return (
-          taskDate.getFullYear() === currentCalendarDate.getFullYear() &&
-          taskDate.getMonth() === currentCalendarDate.getMonth() &&
-          taskDate.getDate() === currentCalendarDate.getDate()
-        )
-      })
+                const dayTasks = tasks.filter(task => {
+            if (!task.dueDate) return false
+            const taskDate = new Date(task.dueDate)
+            return (
+              taskDate.getFullYear() === currentCalendarDate.getFullYear() &&
+              taskDate.getMonth() === currentCalendarDate.getMonth() &&
+              taskDate.getDate() === currentCalendarDate.getDate()
+            )
+          })
       
       const today = new Date()
       const isToday = 

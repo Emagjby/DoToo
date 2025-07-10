@@ -20,8 +20,8 @@ DoToo is a comprehensive project management application built with React and Typ
 - ✅ **Kanban Board View** - Full drag-and-drop functionality
 - ✅ **Enhanced List View** - Filtering, sorting, grouping, and task management
 - ✅ **Advanced Calendar View** - Complete with drag-and-drop date changes
+- ✅ **Gantt Chart View** - Timeline visualization with progress tracking
 - ⏳ Table View (placeholder)
-- ⏳ Gantt Chart View (placeholder)  
 - ⏳ Mind Map View (placeholder)
 
 #### Calendar View Features
@@ -46,6 +46,27 @@ DoToo is a comprehensive project management application built with React and Typ
   - ✅ Automatic due date updates when tasks are dropped
   - ✅ Grip handles on tasks for better UX
   - ✅ Visual indicators in status legend
+
+#### Gantt Chart View Features
+- ✅ **Timeline Visualization**: Project timeline with task bars showing start/end dates
+- ✅ **Multiple Time Scales**: Days, weeks, and months view with intelligent headers
+- ✅ **Task Grouping**: Group by category, priority, or assignee
+- ✅ **Progress Tracking**: Visual progress bars on task timelines
+- ✅ **Interactive Timeline**: 
+  - ✅ Zoom in/out functionality for detailed or overview perspectives
+  - ✅ Navigate timeline with previous/next controls
+  - ✅ Click tasks to view detailed information
+- ✅ **Visual Indicators**:
+  - ✅ Priority-based border colors on task names
+  - ✅ Status-based colors for task bars (todo/doing/done)
+  - ✅ Today indicator line in days view
+  - ✅ Weekend highlighting in days view
+- ✅ **Smart Date Handling**: 
+  - ✅ Auto-generates start dates for tasks with only due dates
+  - ✅ Calculates progress based on task status
+  - ✅ Responsive timeline columns based on date range
+- ✅ **Dependencies Support**: Framework for showing task dependencies
+- ✅ **Task Management**: Click to view task details and edit
 
 #### List View Features
 - ✅ Task status management (todo/doing/done)

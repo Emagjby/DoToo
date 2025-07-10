@@ -136,15 +136,15 @@ export default function TaskCard({ task, onEdit }: TaskCardProps) {
               <h3 className={`font-semibold text-foreground text-sm leading-tight ${
                 task.status === 'done' ? 'line-through text-muted-foreground' : ''
               }`}>
-                {task.title}
-              </h3>
-              {task.description && (
+              {task.title}
+            </h3>
+            {task.description && (
                 <p className={`text-muted-foreground text-xs mt-1 line-clamp-2 ${
                   task.status === 'done' ? 'line-through' : ''
                 }`}>
-                  {task.description}
-                </p>
-              )}
+                {task.description}
+              </p>
+            )}
             </div>
           </div>
           <div className="flex items-center gap-1 ml-2">

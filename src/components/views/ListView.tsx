@@ -243,7 +243,7 @@ export default function ListView({ onEdit }: ListViewProps) {
             <div className="space-y-2">
               {groupTasks.map((task) => (
                 <ListTaskItem
-                  key={task.id}
+                   key={task.id}
                   task={task}
                   onEdit={onEdit || (() => {})}
                 />
