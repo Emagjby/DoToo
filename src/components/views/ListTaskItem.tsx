@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { Edit, Trash2, Calendar, Tag, Circle, CheckCircle, AlertTriangle, Copy, Check, Code, ChevronDown, ChevronUp } from 'lucide-react'
 import Editor from '@monaco-editor/react'
 import useTodoStore from '../../stores/todoStore'

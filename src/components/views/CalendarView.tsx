@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react'
-import { ChevronLeft, ChevronRight, Calendar, Plus, Eye, Edit, Circle, CheckCircle, AlertTriangle, Clock, X, GripVertical } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Calendar, Edit, Circle, CheckCircle, AlertTriangle, Clock, X, GripVertical } from 'lucide-react'
 import {
   DndContext,
   DragOverlay,
@@ -56,7 +56,6 @@ interface DroppableCalendarDayProps {
 
 function DraggableTaskCard({ 
   task, 
-  onEdit, 
   getTaskColor, 
   getStatusIcon, 
   isOverdue, 
@@ -96,7 +95,7 @@ function DraggableTaskCard({
       className={`group cursor-pointer p-1.5 rounded text-xs border hover:shadow-sm ${getTaskBorderClass(task)} ${
         isDragging ? 'opacity-0 pointer-events-none' : 'transition-all'
       }`}
-      onClick={(e) => {
+      onClick={() => {
         if (!isDragging) {
           setSelectedTask(task)
         }

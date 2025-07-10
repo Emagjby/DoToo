@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { createPortal } from 'react-dom'
-import { ChevronDown, Plus, Settings, FolderOpen, Star } from 'lucide-react'
+import { ChevronDown, Plus, FolderOpen, Star } from 'lucide-react'
 import useProjectStore from '../../stores/projectStore'
 import useTodoStore from '../../stores/todoStore'
 import { PROJECT_TYPES } from '../../types'

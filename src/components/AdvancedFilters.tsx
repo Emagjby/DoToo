@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { Code, Calendar, Clock, Tag, ChevronDown, ChevronUp } from 'lucide-react'
 import useTodoStore from '../stores/todoStore'
 

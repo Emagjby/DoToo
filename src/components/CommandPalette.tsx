@@ -1,32 +1,22 @@
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Command } from 'cmdk'
 import { 
   Search, 
   Plus, 
-  Sun, 
-  Moon, 
-  Settings, 
-  Trash2, 
-  Edit, 
-  Eye,
-  GitBranch,
-  Code,
-  Tag,
-  Calendar,
-  CheckCircle,
-  Clock,
-  AlertTriangle,
+  Sun,
+  Moon,
   Database,
-  Download,
-  Upload,
-  Save,
-  Folder,
-  FolderOpen,
+  Filter,
+  Trash2,
+  X,
+  Calendar,
+  BarChart3,
   Layout,
   List,
-  BarChart3,
   Table,
-  Network
+  Network,
+  FolderOpen,
+  Edit
 } from 'lucide-react'
 import useTodoStore from '../stores/todoStore'
 import useProjectStore from '../stores/projectStore'
@@ -55,9 +45,9 @@ const priorityOptions = [
 ] as const
 
 const statusOptions = [
-  { value: 'todo', label: 'To Do', icon: Clock },
-  { value: 'doing', label: 'In Progress', icon: AlertTriangle },
-  { value: 'done', label: 'Done', icon: CheckCircle },
+  { value: 'todo', label: 'To Do', icon: Calendar },
+  { value: 'doing', label: 'In Progress', icon: Filter },
+  { value: 'done', label: 'Done', icon: X },
 ] as const
 
 export default function CommandPalette({ isOpen, onClose, onOpenDataManagement }: CommandPaletteProps) {
@@ -69,7 +59,6 @@ export default function CommandPalette({ isOpen, onClose, onOpenDataManagement }
     setSearchFilters, 
     clearFilters,
     deleteTask,
-    selectedTask,
     setSelectedTask
   } = useTodoStore()
   

@@ -1,5 +1,5 @@
-import React, { useState } from 'react'
-import { ChevronDown, ChevronUp, SortAsc, SortDesc, Filter, MoreHorizontal, Circle, CheckCircle, AlertTriangle } from 'lucide-react'
+import { useState } from 'react'
+import { SortAsc, SortDesc, Circle, CheckCircle, AlertTriangle } from 'lucide-react'
 import useTodoStore from '../../stores/todoStore'
 import useProjectStore from '../../stores/projectStore'
 import type { Task, ListViewConfig } from '../../types'

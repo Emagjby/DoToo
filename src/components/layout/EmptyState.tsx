@@ -1,4 +1,3 @@
-import React from 'react'
 import { Plus, FolderOpen } from 'lucide-react'
 import Button from '../ui/Button'
 import useProjectStore from '../../stores/projectStore'

@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
-import type { Task, TaskStatus, Category, Priority, SearchFilters } from '@/types'
+import type { Task, TaskStatus, SearchFilters } from '@/types'
 import useProjectStore from './projectStore'
 
 interface TodoState {

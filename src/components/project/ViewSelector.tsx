@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { ChevronDown, Layout, List, Calendar, BarChart3, Table, Network } from 'lucide-react'
 import useProjectStore from '../../stores/projectStore'
 import type { ViewType } from '../../types'

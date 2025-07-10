@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useRef, useEffect, useLayoutEffect } from 'react'
+import { useState, useMemo, useRef, useEffect, useLayoutEffect } from 'react'
 import { BarChart3, Calendar, ChevronLeft, ChevronRight, ChevronDown } from 'lucide-react'
 import useTodoStore from '../../stores/todoStore'
 import useProjectStore from '../../stores/projectStore'
@@ -84,7 +84,6 @@ export default function GanttView({ onEdit }: GanttViewProps) {
   const { activeProject } = useProjectStore()
   const [selectedTask, setSelectedTask] = useState<Task | null>(null)
   const [currentDate, setCurrentDate] = useState(new Date())
-  const [editingTask, setEditingTask] = useState<string | null>(null)
   const [statusDropdowns, setStatusDropdowns] = useState<Set<string>>(new Set())
   const [priorityDropdowns, setPriorityDropdowns] = useState<Set<string>>(new Set())
   const timelineRef = useRef<HTMLDivElement>(null)
@@ -408,7 +407,7 @@ export default function GanttView({ onEdit }: GanttViewProps) {
               </div>
               <div className="flex-1 min-w-0" ref={timelineRef}>
                 <div className="flex">
-                  {timelineData.columns.map((col, index) => (
+                  {timelineData.columns.map((col) => (
                     <div
                       key={col.id}
                       id={col.id}
@@ -432,7 +431,7 @@ export default function GanttView({ onEdit }: GanttViewProps) {
 
             {/* Task Rows */}
             <div className="relative">
-              {ganttTasks.map((item, index) => (
+              {ganttTasks.map((item) => (
                 <div key={item.task.id} className="flex border-b border-border hover:bg-muted/20 transition-colors">
                   {/* Task Info Column */}
                   <div className="w-80 p-3 border-r border-border">

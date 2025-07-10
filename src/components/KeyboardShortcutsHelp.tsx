@@ -1,11 +1,7 @@
-import React, { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { Keyboard, X } from 'lucide-react'
 
-interface KeyboardShortcutsHelpProps {
-  onClose?: () => void
-}
-
-export default function KeyboardShortcutsHelp({ onClose }: KeyboardShortcutsHelpProps) {
+export default function KeyboardShortcutsHelp() {
   const [isOpen, setIsOpen] = useState(false)
 
   const shortcuts = [

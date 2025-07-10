@@ -2,27 +2,24 @@ import React, { useState, useRef } from 'react'
 import { 
   Download, 
   Upload, 
-  Save, 
-  RotateCcw, 
   Trash2, 
-  FileText, 
-  Database, 
   AlertTriangle, 
-  CheckCircle, 
-  X, 
-  RefreshCw,
+  CheckCircle,
+  X,
+  RotateCcw,
+  Database,
   HardDrive,
-  FileJson,
-  FileSpreadsheet,
-  Settings,
+  Clock,
+  Zap,
   Shield,
   Archive,
-  FolderOpen,
-  Folder
+  Cpu,
+  Users,
+  BarChart
 } from 'lucide-react'
-import dataManager, { type DataExport, type DataValidationResult, type BackupInfo, type ProjectExport } from '../services/dataManager'
-import useProjectStore from '../stores/projectStore'
+import dataManager, { type DataValidationResult, type BackupInfo } from '../services/dataManager'
 import useTodoStore from '../stores/todoStore'
+import useProjectStore from '../stores/projectStore'
 
 interface DataManagementProps {
   isOpen: boolean
@@ -34,9 +31,8 @@ export default function DataManagement({ isOpen, onClose }: DataManagementProps)
   const [importResult, setImportResult] = useState<DataValidationResult | null>(null)
   const [backups, setBackups] = useState<BackupInfo[]>([])
   const [isLoading, setIsLoading] = useState(false)
-  const [showConfirmClear, setShowConfirmClear] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
-  const { activeProject, projects } = useProjectStore()
+  const { projects } = useProjectStore()
   const { tasks } = useTodoStore()
 
   // Load backups on mount
@@ -267,9 +263,9 @@ export default function DataManagement({ isOpen, onClose }: DataManagementProps)
                   {[
                     { id: 'export', label: 'Export', icon: Download },
                     { id: 'import', label: 'Import', icon: Upload },
-                    { id: 'projects', label: 'Projects', icon: Folder },
-                    { id: 'backup', label: 'Backup', icon: Save },
-                    { id: 'cleanup', label: 'Cleanup', icon: Trash2 }
+                    { id: 'projects', label: 'Projects', icon: Users },
+                    { id: 'backup', label: 'Backup', icon: Zap },
+                    { id: 'cleanup', label: 'Cleanup', icon: Clock }
                   ].map((tab) => {
                     const IconComponent = tab.icon
                     return (
@@ -307,7 +303,7 @@ export default function DataManagement({ isOpen, onClose }: DataManagementProps)
                           className="flex items-center gap-3 p-4 rounded-lg border border-border bg-background hover:bg-accent transition-colors"
                         >
                           <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-primary/10">
-                            <FileJson size={20} className="text-primary" />
+                            <Cpu size={20} className="text-primary" />
                           </div>
                           <div className="text-left">
                             <div className="font-medium text-foreground">Export as JSON</div>
@@ -320,7 +316,7 @@ export default function DataManagement({ isOpen, onClose }: DataManagementProps)
                           className="flex items-center gap-3 p-4 rounded-lg border border-border bg-background hover:bg-accent transition-colors"
                         >
                           <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-primary/10">
-                            <FileSpreadsheet size={20} className="text-primary" />
+                            <BarChart size={20} className="text-primary" />
                           </div>
                           <div className="text-left">
                             <div className="font-medium text-foreground">Export as CSV</div>
@@ -365,7 +361,7 @@ export default function DataManagement({ isOpen, onClose }: DataManagementProps)
                           disabled={isLoading}
                           className="flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 transition-colors disabled:opacity-50"
                         >
-                          {isLoading ? <RefreshCw size={16} className="animate-spin" /> : <Upload size={16} />}
+                          {isLoading ? <Clock size={16} className="animate-spin" /> : <Upload size={16} />}
                           {isLoading ? 'Importing...' : 'Choose File'}
                         </button>
                       </div>
@@ -437,7 +433,7 @@ export default function DataManagement({ isOpen, onClose }: DataManagementProps)
                         <div className="p-4 rounded-lg border border-border bg-background">
                           <div className="flex items-center gap-3 mb-4">
                             <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-primary/10">
-                              <FolderOpen size={20} className="text-primary" />
+                              <Archive size={20} className="text-primary" />
                             </div>
                             <div>
                               <div className="font-medium text-foreground">Export Projects</div>
@@ -448,7 +444,7 @@ export default function DataManagement({ isOpen, onClose }: DataManagementProps)
                           <div className="space-y-2">
                             {projects.length === 0 ? (
                               <div className="p-4 text-center text-muted-foreground">
-                                <Folder size={32} className="mx-auto mb-2 opacity-50" />
+                                <Users size={32} className="mx-auto mb-2 opacity-50" />
                                 <p className="text-sm">No projects found</p>
                               </div>
                             ) : (
@@ -509,7 +505,7 @@ export default function DataManagement({ isOpen, onClose }: DataManagementProps)
                             disabled={isLoading}
                             className="flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 transition-colors disabled:opacity-50"
                           >
-                            {isLoading ? <RefreshCw size={16} className="animate-spin" /> : <Upload size={16} />}
+                            {isLoading ? <Clock size={16} className="animate-spin" /> : <Upload size={16} />}
                             {isLoading ? 'Importing...' : 'Choose Project File'}
                           </button>
                         </div>
@@ -531,7 +527,7 @@ export default function DataManagement({ isOpen, onClose }: DataManagementProps)
                           onClick={handleCreateBackup}
                           className="flex items-center gap-2 px-3 py-1.5 text-sm font-medium rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
                         >
-                          <Save size={16} />
+                          <Zap size={16} />
                           Create Backup
                         </button>
                       </div>

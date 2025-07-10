@@ -1,5 +1,4 @@
-import React from 'react'
-import { Plus, Sun, Moon } from 'lucide-react'
+import { Plus, Moon, Sun } from 'lucide-react'
 import Button from '../ui/Button'
 import useTodoStore from '../../stores/todoStore'
 import DoTooLogo from './DoTooLogo'

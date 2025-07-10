@@ -1,5 +1,4 @@
-import React from 'react'
-import { BarChart3, Clock, AlertTriangle, CheckCircle, Folder } from 'lucide-react'
+import { CheckCircle, Clock, AlertTriangle, TrendingUp } from 'lucide-react'
 import useTodoStore from '../stores/todoStore'
 import useProjectStore from '../stores/projectStore'
 
@@ -15,15 +14,11 @@ export default function TaskStats({ isSearchExpanded }: TaskStatsProps) {
   const projectTasks = activeProject() ? tasks.filter(task => task.projectId === activeProject()?.id) : tasks
   
   const totalTasks = projectTasks.length
+  const completedCount = projectTasks.filter(task => task.status === 'done').length
+  const inProgressCount = projectTasks.filter(task => task.status === 'doing').length
   const todoCount = projectTasks.filter(task => task.status === 'todo').length
-  const doingCount = projectTasks.filter(task => task.status === 'doing').length
-  const doneCount = projectTasks.filter(task => task.status === 'done').length
-  
+
   const highPriorityCount = projectTasks.filter(task => task.priority === 'high' || task.priority === 'critical').length
-  const overdueCount = projectTasks.filter(task => {
-    if (!task.dueDate) return false
-    return new Date(task.dueDate) < new Date() && task.status !== 'done'
-  }).length
 
   const handleQuickFilter = (status: 'todo' | 'doing' | 'done' | 'high-priority' | 'overdue') => {
     if (status === 'high-priority') {
@@ -46,7 +41,7 @@ export default function TaskStats({ isSearchExpanded }: TaskStatsProps) {
       {/* Project Indicator */}
       {activeProject() && (
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
-          <Folder size={14} />
+          <TrendingUp size={14} />
           <span>Showing stats for:</span>
           <div className="flex items-center gap-1 px-2 py-1 bg-muted/50 rounded-md">
             <div 
@@ -62,7 +57,7 @@ export default function TaskStats({ isSearchExpanded }: TaskStatsProps) {
       {/* Total Tasks */}
       <div className="bg-background border border-border rounded-lg p-3">
         <div className="flex items-center gap-2 mb-1">
-          <BarChart3 size={14} className="text-muted-foreground" />
+          <TrendingUp size={14} className="text-muted-foreground" />
           <span className="text-xs text-muted-foreground">Total</span>
         </div>
         <div className="text-xl font-bold text-foreground">{totalTasks}</div>
@@ -89,7 +84,7 @@ export default function TaskStats({ isSearchExpanded }: TaskStatsProps) {
           <AlertTriangle size={14} className="text-orange-500" />
           <span className="text-xs text-muted-foreground">In Progress</span>
         </div>
-        <div className="text-xl font-bold text-orange-500">{doingCount}</div>
+        <div className="text-xl font-bold text-orange-500">{inProgressCount}</div>
       </button>
 
       {/* Done */}
@@ -101,7 +96,7 @@ export default function TaskStats({ isSearchExpanded }: TaskStatsProps) {
           <CheckCircle size={14} className="text-green-500" />
           <span className="text-xs text-muted-foreground">Done</span>
         </div>
-        <div className="text-xl font-bold text-green-500">{doneCount}</div>
+        <div className="text-xl font-bold text-green-500">{completedCount}</div>
       </button>
 
       {/* High Priority */}

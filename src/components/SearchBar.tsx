@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect, forwardRef } from 'react'
-import { Search, X, Filter, ChevronDown, Tag, AlertTriangle, CheckCircle, Clock, ChevronUp, Folder } from 'lucide-react'
+import { Search, X, Filter, ChevronDown, Tag, AlertTriangle, CheckCircle, Clock, ChevronUp } from 'lucide-react'
 import useTodoStore from '../stores/todoStore'
 import useProjectStore from '../stores/projectStore'
 import type { Category, Priority, TaskStatus } from '../types'

@@ -1,13 +1,10 @@
-import React, { useState, useEffect, useRef } from 'react'
-import { Plus, Code, Calendar, Tag, AlertTriangle, GitBranch, FileText, Settings, Clock, ChevronDown, Sparkles, Bug, BookOpen, Wrench, TestTube, Scissors, Languages, X, Github, Edit } from 'lucide-react'
-import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter'
-import { tomorrow } from 'react-syntax-highlighter/dist/esm/styles/prism'
+import React, { useState, useEffect } from 'react'
+import { Plus, Code, Tag, GitBranch, FileText, Clock, ChevronDown, Sparkles, Bug, BookOpen, Wrench, TestTube, Scissors, Languages, X, Edit } from 'lucide-react'
 import Editor from '@monaco-editor/react'
 import useTodoStore from '../stores/todoStore'
-import type { Task, Category, Priority } from '../types'
+import useProjectStore from '../stores/projectStore'
+import type { Task, Category, Priority, TaskStatus } from '../types'
 import { generateBranchName } from '../lib/utils'
-import Modal from './ui/Modal'
-import Button from './ui/Button'
 
 interface TaskFormProps {
   task?: Task
@@ -259,6 +256,7 @@ const languages: { value: string; label: string; icon: React.ReactNode }[] = [
 
 export default function TaskForm({ task, isOpen, onClose }: TaskFormProps) {
   const { addTask, updateTask } = useTodoStore()
+  const { activeProject } = useProjectStore()
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -266,8 +264,8 @@ export default function TaskForm({ task, isOpen, onClose }: TaskFormProps) {
     priority: 'medium' as Priority,
     dueDate: '',
     branchName: '',
+    status: 'todo' as TaskStatus,
   })
-  const [showCode, setShowCode] = useState(false)
   const [suggestedBranch, setSuggestedBranch] = useState('')
   const [useCustomBranch, setUseCustomBranch] = useState(false)
   const [showLanguageDropdown, setShowLanguageDropdown] = useState(false)
@@ -283,6 +281,7 @@ export default function TaskForm({ task, isOpen, onClose }: TaskFormProps) {
         priority: task.priority,
         dueDate: task.dueDate ? new Date(task.dueDate).toISOString().split('T')[0] : '',
         branchName: task.branchName || '',
+        status: task.status,
       })
       setUseCustomBranch(!!task.branchName)
       setCode(task.code || '');
@@ -295,6 +294,7 @@ export default function TaskForm({ task, isOpen, onClose }: TaskFormProps) {
         priority: 'medium',
         dueDate: '',
         branchName: '',
+        status: 'todo',
       })
       setUseCustomBranch(false)
       setCode('');
@@ -325,16 +325,21 @@ export default function TaskForm({ task, isOpen, onClose }: TaskFormProps) {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     
+    if (!formData.title.trim()) return
+
+    const currentProject = activeProject()
+
     const taskData = {
-      title: formData.title.trim(),
-      description: formData.description.trim(),
-      code: code.trim() || undefined,
+      title: formData.title,
+      description: formData.description,
+      code: code || undefined,
       language: selectedLanguage,
       category: formData.category,
       priority: formData.priority,
-      status: task?.status || 'todo',
+      status: formData.status,
       dueDate: formData.dueDate ? new Date(formData.dueDate) : undefined,
       branchName: useCustomBranch ? formData.branchName.trim() : suggestedBranch,
+      projectId: currentProject?.id || 'default'
     }
 
     if (task) {
@@ -342,15 +347,9 @@ export default function TaskForm({ task, isOpen, onClose }: TaskFormProps) {
     } else {
       addTask(taskData)
     }
-    
-    // Small delay to ensure state updates are processed
-    setTimeout(() => {
-      onClose()
-    }, 100)
-  }
 
-  const currentLanguage = languages.find(lang => lang.value === selectedLanguage)
-  const currentCategory = categories.find(cat => cat.value === formData.category)
+    onClose()
+  }
 
   return (
     <div className={`fixed inset-0 z-50 ${isOpen ? 'block' : 'hidden'}`}>

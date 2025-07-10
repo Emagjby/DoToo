@@ -1,4 +1,3 @@
-import React from 'react'
 import useProjectStore from '../../stores/projectStore'
 import type { Task } from '../../types'
 import Board from '../kanban/Board'

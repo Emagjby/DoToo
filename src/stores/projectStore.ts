@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
-import type { Project, ProjectType, ViewType, PROJECT_TYPES } from '@/types'
+import type { Project, ProjectType } from '@/types'
 
 interface ProjectState {
   projects: Project[]
