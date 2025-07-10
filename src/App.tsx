@@ -176,7 +176,7 @@ function App() {
           ) : (
             <EmptyState onNewTask={handleNewTask} />
           )}
-        </div>
+      </div>
 
         {/* Command Palette */}
         <CommandPalette 
@@ -201,7 +201,7 @@ function App() {
         isOpen={isFormOpen}
         onClose={handleCloseForm}
       />
-    </div>
+      </div>
   )
 }
 

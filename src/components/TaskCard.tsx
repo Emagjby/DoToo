@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Edit, Trash2, Code, Calendar, Tag, AlertTriangle, Copy, Check } from 'lucide-react'
+import { Edit, Trash2, Code, Calendar, Tag, AlertTriangle, Copy, Check, Circle, CheckCircle } from 'lucide-react'
 import Editor from '@monaco-editor/react'
 import useTodoStore from '../stores/todoStore'
 import type { Task, Category, Priority } from '../types'
@@ -54,7 +54,7 @@ const getMonacoLanguage = (language: string): string => {
 }
 
 export default function TaskCard({ task, onEdit }: TaskCardProps) {
-  const { deleteTask, isDarkMode } = useTodoStore()
+  const { deleteTask, isDarkMode, updateTaskStatus } = useTodoStore()
   const [showCode, setShowCode] = useState(false)
   const [copied, setCopied] = useState(false)
   const [copiedBranch, setCopiedBranch] = useState(false)
@@ -84,20 +84,68 @@ export default function TaskCard({ task, onEdit }: TaskCardProps) {
     }
   }
 
+  const handleStatusToggle = () => {
+    const newStatus = task.status === 'done' ? 'todo' : 'done'
+    updateTaskStatus(task.id, newStatus)
+  }
+
+  const getStatusIcon = () => {
+    switch (task.status) {
+      case 'todo':
+        return <Circle size={16} className="text-muted-foreground" />
+      case 'doing':
+        return <AlertTriangle size={16} className="text-blue-500" />
+      case 'done':
+        return <CheckCircle size={16} className="text-green-500" />
+      default:
+        return <Circle size={16} className="text-muted-foreground" />
+    }
+  }
+
+  const getStatusLabel = () => {
+    switch (task.status) {
+      case 'todo':
+        return 'To Do'
+      case 'doing':
+        return 'In Progress'
+      case 'done':
+        return 'Done'
+      default:
+        return 'To Do'
+    }
+  }
+
   return (
-    <div className="bg-background border-2 border-border rounded-md shadow-lg hover:shadow-xl transition-all duration-200 hover:border-border/80">
+    <div className={`bg-background border-2 border-border rounded-md shadow-lg hover:shadow-xl transition-all duration-200 hover:border-border/80 ${
+      task.status === 'done' ? 'opacity-75' : ''
+    }`}>
       {/* Header */}
       <div className="p-4 border-b-2 border-border">
         <div className="flex items-start justify-between">
-          <div className="flex-1">
-            <h3 className="font-semibold text-foreground text-sm leading-tight">
-              {task.title}
-            </h3>
-            {task.description && (
-              <p className="text-muted-foreground text-xs mt-1 line-clamp-2">
-                {task.description}
-              </p>
-            )}
+          <div className="flex-1 flex items-start gap-3">
+            {/* Status Toggle */}
+            <button
+              onClick={handleStatusToggle}
+              className="flex-shrink-0 mt-0.5 p-1 hover:bg-accent rounded transition-colors"
+              title={task.status === 'done' ? 'Mark as incomplete' : 'Mark as complete'}
+            >
+              {getStatusIcon()}
+            </button>
+            
+            <div className="flex-1 min-w-0">
+              <h3 className={`font-semibold text-foreground text-sm leading-tight ${
+                task.status === 'done' ? 'line-through text-muted-foreground' : ''
+              }`}>
+                {task.title}
+              </h3>
+              {task.description && (
+                <p className={`text-muted-foreground text-xs mt-1 line-clamp-2 ${
+                  task.status === 'done' ? 'line-through' : ''
+                }`}>
+                  {task.description}
+                </p>
+              )}
+            </div>
           </div>
           <div className="flex items-center gap-1 ml-2">
             <button
@@ -120,8 +168,12 @@ export default function TaskCard({ task, onEdit }: TaskCardProps) {
 
       {/* Meta Information */}
       <div className="p-4 space-y-3">
-        {/* Categories and Priority */}
+        {/* Status, Categories and Priority */}
         <div className="flex items-center gap-2 flex-wrap">
+          <Badge variant={task.status}>
+            {getStatusIcon()}
+            {getStatusLabel()}
+          </Badge>
           <Badge variant={task.category}>
             {category.label}
           </Badge>

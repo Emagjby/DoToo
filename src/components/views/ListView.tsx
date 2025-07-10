@@ -1,9 +1,9 @@
 import React, { useState } from 'react'
-import { ChevronDown, ChevronUp, SortAsc, SortDesc, Filter, MoreHorizontal } from 'lucide-react'
+import { ChevronDown, ChevronUp, SortAsc, SortDesc, Filter, MoreHorizontal, Circle, CheckCircle, AlertTriangle } from 'lucide-react'
 import useTodoStore from '../../stores/todoStore'
 import useProjectStore from '../../stores/projectStore'
 import type { Task, ListViewConfig } from '../../types'
-import TaskCard from '../TaskCard'
+import ListTaskItem from './ListTaskItem'
 
 interface ListViewProps {
   onEdit?: (task: Task) => void
@@ -59,6 +59,11 @@ export default function ListView({ onEdit }: ListViewProps) {
         case 'category':
           aValue = a.category
           bValue = b.category
+          break
+        case 'status':
+          const statusOrder = { todo: 1, doing: 2, done: 3 }
+          aValue = statusOrder[a.status]
+          bValue = statusOrder[b.status]
           break
         default:
           aValue = a.title.toLowerCase()
@@ -131,6 +136,32 @@ export default function ListView({ onEdit }: ListViewProps) {
     }))
   }
 
+  const getStatusIcon = (status: string) => {
+    switch (status) {
+      case 'todo':
+        return <Circle size={14} className="text-muted-foreground" />
+      case 'doing':
+        return <AlertTriangle size={14} className="text-blue-500" />
+      case 'done':
+        return <CheckCircle size={14} className="text-green-500" />
+      default:
+        return <Circle size={14} className="text-muted-foreground" />
+    }
+  }
+
+  const getStatusLabel = (status: string) => {
+    switch (status) {
+      case 'todo':
+        return 'To Do'
+      case 'doing':
+        return 'In Progress'
+      case 'done':
+        return 'Done'
+      default:
+        return 'To Do'
+    }
+  }
+
   return (
     <div className="space-y-6">
       {/* List Controls */}
@@ -139,7 +170,7 @@ export default function ListView({ onEdit }: ListViewProps) {
           <div className="flex items-center gap-2">
             <span className="text-sm font-medium text-foreground">Sort by:</span>
             <div className="flex items-center gap-1">
-              {(['title', 'priority', 'dueDate', 'createdAt', 'category'] as const).map(field => (
+              {(['title', 'priority', 'status', 'dueDate', 'createdAt', 'category'] as const).map(field => (
                 <button
                   key={field}
                   onClick={() => handleSort(field)}
@@ -198,18 +229,24 @@ export default function ListView({ onEdit }: ListViewProps) {
               <div className="flex items-center gap-2">
                 <h3 className="text-lg font-semibold text-foreground">{groupName}</h3>
                 <span className="text-sm text-muted-foreground">({groupTasks.length})</span>
+                {config.groupBy === 'status' && (
+                  <div className="flex items-center gap-1 ml-2">
+                    {getStatusIcon(groupName.toLowerCase())}
+                    <span className="text-xs text-muted-foreground">
+                      {getStatusLabel(groupName.toLowerCase())}
+                    </span>
+                  </div>
+                )}
               </div>
             )}
             
-            <div className="space-y-3">
+            <div className="space-y-2">
               {groupTasks.map((task) => (
-                                 <div
-                   key={task.id}
-                   className="bg-background border border-border rounded-lg p-4 hover:border-primary/50 transition-colors"
-                 >
-                   {onEdit && <TaskCard task={task} onEdit={onEdit} />}
-                   {!onEdit && <TaskCard task={task} onEdit={() => {}} />}
-                 </div>
+                <ListTaskItem
+                  key={task.id}
+                  task={task}
+                  onEdit={onEdit || (() => {})}
+                />
               ))}
             </div>
           </div>

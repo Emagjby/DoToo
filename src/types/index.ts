@@ -92,7 +92,7 @@ export interface ThemeConfig {
 
 // View-specific interfaces
 export interface ListViewConfig {
-  sortBy: 'title' | 'priority' | 'dueDate' | 'createdAt' | 'category'
+  sortBy: 'title' | 'priority' | 'status' | 'dueDate' | 'createdAt' | 'category'
   sortOrder: 'asc' | 'desc'
   groupBy?: 'category' | 'priority' | 'status' | 'assignedTo'
   showCompleted: boolean
