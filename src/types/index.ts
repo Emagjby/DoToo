@@ -99,10 +99,10 @@ export interface ListViewConfig {
 }
 
 export interface CalendarViewConfig {
-  viewMode: 'month' | 'week' | 'day'
+  viewMode: 'month' | 'week' | 'year'
   showCompleted: boolean
   showOverdue: boolean
-  colorBy: 'category' | 'priority' | 'project'
+  colorBy: 'category' | 'priority'
 }
 
 export interface TableViewConfig {

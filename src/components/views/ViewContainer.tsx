@@ -3,6 +3,7 @@ import useProjectStore from '../../stores/projectStore'
 import type { Task } from '../../types'
 import Board from '../kanban/Board'
 import ListView from './ListView'
+import CalendarView from './CalendarView'
 
 interface ViewContainerProps {
   onEdit?: (task: Task) => void
@@ -33,14 +34,7 @@ export default function ViewContainer({ onEdit }: ViewContainerProps) {
       return <ListView onEdit={onEdit} />
     
     case 'calendar':
-      return (
-        <div className="flex items-center justify-center h-64 text-muted-foreground">
-          <div className="text-center">
-            <div className="text-lg font-medium mb-2">Calendar View</div>
-            <div className="text-sm">Coming soon...</div>
-          </div>
-        </div>
-      )
+      return <CalendarView onEdit={onEdit} />
     
     case 'gantt':
       return (

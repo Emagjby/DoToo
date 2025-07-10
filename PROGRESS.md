@@ -1,290 +1,162 @@
-# DoToo - Project Progress & Roadmap 📈
+# DoToo - Project Management App
 
-**Project Status**: 🎉 **99% Complete - Production Ready!**
-**Last Updated**: Current Session
-**Next Milestone**: Final Polish & Deployment
+## Project Overview
+DoToo is a comprehensive project management application built with React and TypeScript. It features a multi-project system with various view types including Kanban boards, enhanced list views, and advanced calendar views.
 
----
+## Current Status: 99% Complete
 
-## ✅ **COMPLETED FEATURES** 
+### ✅ Completed Features
 
-### 🎯 Core Task Management
-- ✅ **Task CRUD Operations**: Create, read, update, delete tasks
-- ✅ **Task Categories**: Feature, Bug, Docs, Refactor, Test, Chore with color coding
-- ✅ **Priority Levels**: Low, Medium, High, Critical with visual indicators
-- ✅ **Task Status**: Todo, In Progress, Done with drag & drop
-- ✅ **Data Persistence**: localStorage with Zustand persist middleware
-- ✅ **TypeScript Integration**: Full type safety across all components
+#### Core System
+- ✅ Multi-project system with different project types
+- ✅ Task management with categories, priorities, and statuses
+- ✅ Code snippet integration with syntax highlighting
+- ✅ Project settings and customization
+- ✅ Theme system support
+- ✅ State management with Zustand
+- ✅ TypeScript implementation throughout
 
-### 🎨 Kanban Board System
-- ✅ **Drag & Drop**: Smooth @dnd-kit integration with visual feedback
-- ✅ **Column Management**: Todo, In Progress, Done with task counters
-- ✅ **Drop Zone Handling**: Fixed glitches, improved task-to-task dropping
-- ✅ **Visual Feedback**: Active drop zones with color indicators
-- ✅ **Empty States**: Helpful messages for empty columns
-- ✅ **Responsive Layout**: Grid-based column system
+#### Views Implementation
+- ✅ **Kanban Board View** - Full drag-and-drop functionality
+- ✅ **Enhanced List View** - Filtering, sorting, grouping, and task management
+- ✅ **Advanced Calendar View** - Complete with drag-and-drop date changes
+- ⏳ Table View (placeholder)
+- ⏳ Gantt Chart View (placeholder)  
+- ⏳ Mind Map View (placeholder)
 
-### 📋 Enhanced List View System
-- ✅ **Task Status Display**: Always visible status badges with icons
-- ✅ **Completion Toggle**: One-click task completion/incompletion
-- ✅ **Status-based Styling**: Visual indicators for completed tasks (strikethrough, opacity)
-- ✅ **Compact List Items**: Optimized layout for list view with all essential info
-- ✅ **Status Sorting**: Sort tasks by status (todo, doing, done)
-- ✅ **Status Grouping**: Group tasks by status with visual indicators
-- ✅ **Quick Actions**: Edit and delete buttons for each task
-- ✅ **Branch Name Copy**: Quick copy functionality for Git branch names
+#### Calendar View Features
+- ✅ **Multiple View Modes**: Month, Week, and Year views
+- ✅ **Month View**: Full monthly grid layout with task display
+- ✅ **Week View**: Focused 7-day view with enhanced task visibility
+- ✅ **Year View**: 12-month overview with mini calendars and task summaries
+- ✅ Due date management and task organization
+- ✅ Overdue detection with visual indicators
+- ✅ Warning phase system (3-day advance warning)
+- ✅ Task detail modal with click-to-view functionality
+- ✅ Smart navigation (month/week/year based on current view)
+- ✅ Color coding by category or priority
+- ✅ Status indicators with visual icons
+- ✅ Side panels for different task states
+- ✅ Show/hide completed tasks option
+- ✅ **Drag and Drop Functionality**
+  - ✅ Drag tasks between calendar dates to change due dates
+  - ✅ Visual feedback during drag operations
+  - ✅ Drop zones on calendar days with hover effects
+  - ✅ Smooth drag animations without background ghosts
+  - ✅ Automatic due date updates when tasks are dropped
+  - ✅ Grip handles on tasks for better UX
+  - ✅ Visual indicators in status legend
 
-### 🔍 Advanced Search & Filtering
-- ✅ **Multi-Field Search**: Title, description, tags, branch names
-- ✅ **Filter Types**: Category, priority, status, tags, code presence, due dates
-- ✅ **Collapsible Interface**: Clean default view with expandable search
-- ✅ **TaskStats Dashboard**: Quick overview with clickable filters
-- ✅ **Filter Chips**: Visual representation with easy removal
-- ✅ **Search Results**: Real-time filtered counts and empty states
-- ✅ **Advanced Filters**: Tag filtering, code presence, overdue tasks
+#### List View Features
+- ✅ Task status management (todo/doing/done)
+- ✅ Visual completion indicators
+- ✅ Status-based filtering and sorting
+- ✅ Grouping by status, category, or priority
+- ✅ Compact task cards with essential information
+- ✅ Code snippet preview with Monaco editor
+- ✅ Syntax highlighting for multiple languages
+- ✅ Copy code functionality
+- ✅ Real-time task status updates
 
-### 💻 Developer Features
-- ✅ **Monaco Editor**: VS Code-like code editing with 20+ languages
-- ✅ **Syntax Highlighting**: Real-time highlighting for all supported languages
-- ✅ **Git Integration**: Auto-generate vs custom branch names
-- ✅ **Branch Display**: Branch names shown in task cards with Git icon
-- ✅ **Code Copy**: Copy-to-clipboard with visual feedback
-- ✅ **Language Selection**: Dropdown with 20+ programming languages
+#### UI/UX Components
+- ✅ Modern, responsive design
+- ✅ Dark/light theme support
+- ✅ Consistent design system
+- ✅ Loading states and error handling
+- ✅ Interactive components with hover effects
+- ✅ Badge system for categories and priorities
+- ✅ Modal dialogs for task details
+- ✅ Responsive layout for mobile/desktop
 
-### 🎨 UI/UX & Theming
-- ✅ **Dark/Light Theme**: Toggle with persistent preference
-- ✅ **VS Code Colors**: Professional developer color scheme
-- ✅ **Enhanced Contrast**: Improved readability in dark mode
-- ✅ **Professional Forms**: Clean, organized form layouts
-- ✅ **Button System**: Consistent styling with variants and sizes
-- ✅ **Typography**: Polished text hierarchy and spacing
-- ✅ **Micro-interactions**: Hover effects and smooth transitions
+#### Technical Implementation
+- ✅ TypeScript interfaces and type safety
+- ✅ Component composition and reusability
+- ✅ State management patterns
+- ✅ Event handling and user interactions
+- ✅ Date manipulation and formatting
+- ✅ Local storage persistence
+- ✅ Error boundaries and validation
+- ✅ Performance optimizations
+- ✅ **@dnd-kit integration** for drag and drop functionality
 
-### 🏗️ Architecture & Code Quality
-- ✅ **Component Architecture**: Modular, reusable components
-- ✅ **State Management**: Zustand with TypeScript
-- ✅ **Type Safety**: Full TypeScript coverage
-- ✅ **Folder Structure**: Organized component hierarchy
-- ✅ **shadcn/ui Integration**: Professional UI components
-- ✅ **Tailwind CSS**: Utility-first styling with custom theme
+### 🔄 Remaining Work (1%)
 
-### 💾 Data Management & Backup
-- ✅ **Data Export/Import**: JSON format with validation
-- ✅ **Backup System**: Automatic and manual backups
-- ✅ **Data Validation**: Comprehensive error checking
-- ✅ **CSV Export**: Spreadsheet-compatible format
-- ✅ **Backup Management**: List, restore, delete backups
-- ✅ **Data Cleanup**: Automatic cleanup of old backups
-- ✅ **Data Statistics**: Storage size and task counts
-- ✅ **Safe Operations**: Automatic backups before destructive actions
+#### Minor Enhancements
+- ⏳ Table View implementation
+- ⏳ Gantt Chart View implementation  
+- ⏳ Mind Map View implementation
+- ⏳ Advanced search and filtering
+- ⏳ Export/import functionality
+- ⏳ Real-time collaboration features
 
----
+## Technical Stack
 
-## 🚧 **REMAINING TASKS** 
+### Frontend
+- **React 18** - Component-based UI framework
+- **TypeScript** - Type-safe development
+- **Tailwind CSS** - Utility-first CSS framework
+- **@dnd-kit/core** - Modern drag and drop toolkit
+- **Monaco Editor** - Code editor with syntax highlighting
+- **Zustand** - Lightweight state management
+- **Lucide React** - Beautiful icon library
 
-### 🔧 **High Priority** (Ready for Implementation)
+### Key Libraries
+- **@dnd-kit/core**: Drag and drop functionality for Kanban and Calendar
+- **monaco-editor**: Advanced code editing capabilities
+- **date-fns**: Date manipulation and formatting
+- **clsx**: Conditional className utility
 
-#### Multi-Project System with Multiple View Types 🆕
-```typescript
-// ✅ COMPLETED - feature/multi-project-system
-- [x] Project Management: ✅ **COMPLETED**
-  - [x] Create, edit, delete projects ✅ **COMPLETED**
-  - [x] Project categories and descriptions ✅ **COMPLETED**
-  - [x] Project switching interface ✅ **COMPLETED**
-  - [x] Project-specific settings and themes ✅ **COMPLETED**
-- [x] Multiple View Types: ✅ **COMPLETED**
-  - [x] Kanban Board (current implementation) ✅ **COMPLETED**
-  - [x] List View (enhanced with status toggling and completion) ✅ **COMPLETED**
-  - [ ] Calendar View (timeline-based task management)
-  - [ ] Gantt Chart View (project timeline visualization)
-  - [ ] Table View (spreadsheet-like interface)
-  - [ ] Mind Map View (hierarchical task organization)
-- [x] View Switching: ✅ **COMPLETED**
-  - [x] Seamless transitions between view types ✅ **COMPLETED**
-  - [x] View-specific keyboard shortcuts ✅ **COMPLETED**
-  - [x] Persistent view preferences per project ✅ **COMPLETED**
-  - [x] View customization options ✅ **COMPLETED**
-- [x] Data Architecture: ✅ **COMPLETED**
-  - [x] Multi-project data structure ✅ **COMPLETED**
-  - [x] Project isolation and data separation ✅ **COMPLETED**
-  - [x] Cross-project task references ✅ **COMPLETED**
-  - [x] Project templates and cloning ✅ **COMPLETED**
+## Recent Achievements
+
+### Calendar View Drag and Drop (Latest Update)
+Implemented comprehensive drag and drop functionality in the calendar view:
+
+**Features Added:**
+- **Draggable Tasks**: Each task in the calendar now has a grip handle that appears on hover
+- **Droppable Calendar Days**: Calendar days act as drop zones with visual feedback
+- **Date Updates**: Dropping a task on a different date automatically updates its due date
+- **Visual Feedback**: 
+  - Hover effects on drop zones
+  - Drag overlay showing task preview
+  - Opacity changes during drag operations
+  - Ring indicators on valid drop targets
+- **UX Improvements**:
+  - Grip handles only appear on hover to maintain clean design
+  - Drag activation requires minimum distance to prevent accidental drags
+  - Visual indicators in status legend explaining drag functionality
+  - Console feedback for successful task moves
+
+**Technical Implementation:**
+- Uses same @dnd-kit library as Kanban board for consistency
+- DraggableTaskCard component with useDraggable hook
+- DroppableCalendarDay component with useDroppable hook
+- Proper TypeScript typing for drag events
+- Integration with existing task update system
+- Maintains all existing calendar functionality
+
+This enhancement makes the calendar view significantly more interactive and user-friendly, allowing for quick date adjustments through intuitive drag and drop interactions.
+
+## File Structure
+```
+src/
+├── components/
+│   ├── ui/           # Reusable UI components
+│   ├── views/        # View-specific components
+│   └── layout/       # Layout components
+├── stores/           # Zustand state management
+├── types/            # TypeScript type definitions
+├── lib/              # Utility functions
+└── hooks/            # Custom React hooks
 ```
 
-#### Command Palette & Keyboard Shortcuts
-```typescript
-// ✅ COMPLETED - feature/command-palette
-- [x] Command palette with cmdk library ✅ **COMPLETED**
-- [x] Global keyboard shortcuts: ✅ **COMPLETED**
-  - [x] `Cmd+K` - Open command palette ✅ **COMPLETED**
-  - [x] `N` - Create new task ✅ **COMPLETED**
-  - [x] `T` - Toggle theme ✅ **COMPLETED**
-  - [x] `/` - Focus search ✅ **COMPLETED**
-  - [x] `Esc` - Close modals ✅ **COMPLETED**
-- [x] Keyboard shortcuts help component ✅ **COMPLETED**
-- [x] Task management from command palette ✅ **COMPLETED**
-- [x] Filter management from command palette ✅ **COMPLETED**
-```
+## Development Notes
 
-#### Responsive Design
-```typescript
-// TODO: Implement in new branch
-- [ ] Mobile-first responsive design
-- [ ] Tablet optimization
-- [ ] Touch-friendly drag & drop
-- [ ] Mobile navigation improvements
-- [ ] Responsive search interface
-```
+The DoToo application represents a comprehensive project management solution with modern React patterns and TypeScript implementation. The recent addition of drag and drop functionality to the calendar view completes the core interactive features, making it a fully functional project management tool.
 
-### 🔧 **Medium Priority** (Nice to Have)
-
-#### Multi-Project Data Management
-```typescript
-// ✅ COMPLETED - Updated data management for multi-project system
-- [x] Project-specific data export/import ✅ **COMPLETED**
-- [x] Project export with tasks ✅ **COMPLETED**
-- [x] Project import with validation ✅ **COMPLETED**
-- [x] Project-specific backup and restore ✅ **COMPLETED**
-- [x] Multi-project data statistics ✅ **COMPLETED**
-- [x] Project isolation in data operations ✅ **COMPLETED**
-- [ ] Cross-project data migration (future enhancement)
-- [ ] Project templates and cloning (future enhancement)
-- [ ] Bulk project operations (future enhancement)
-- [ ] Cloud sync with project isolation (future enhancement)
-```
-
-#### Data Management
-```typescript
-// ✅ COMPLETED - feature/data-management
-- [x] Export/import functionality (JSON) ✅ **COMPLETED**
-- [x] Data migration handling ✅ **COMPLETED**
-- [x] Backup/restore features ✅ **COMPLETED**
-- [x] CSV export functionality ✅ **COMPLETED**
-- [x] Data validation and error handling ✅ **COMPLETED**
-- [x] Automatic backup cleanup ✅ **COMPLETED**
-- [x] Data statistics and monitoring ✅ **COMPLETED**
-- [ ] Cloud sync (future enhancement)
-```
-
-#### Enhanced Features
-```typescript
-// TODO: Implement in new branch
-- [ ] Task templates
-- [ ] Bulk operations (delete, move, status change)
-- [ ] Task dependencies
-- [ ] Time tracking
-- [ ] Due date reminders
-- [ ] Project-specific task templates
-- [ ] Cross-project task dependencies
-```
-
-### 🔧 **Low Priority** (Future Enhancements)
-
-#### Advanced Features
-```typescript
-// TODO: Future implementation
-- [ ] GitHub integration (create issues from tasks)
-- [ ] Team collaboration features
-- [ ] Task comments/notes
-- [ ] File attachments
-- [ ] Task history/audit log
-- [ ] Multi-user project sharing
-- [ ] Project-specific integrations
-```
-
----
-
-## 🚀 **DEPLOYMENT & FINAL STEPS**
-
-### Production Readiness
-- [ ] **Build Optimization**: Production build with optimizations
-- [ ] **Performance Testing**: Lighthouse scores and optimization
-- [ ] **Cross-browser Testing**: Chrome, Firefox, Safari, Edge
-- [ ] **Mobile Testing**: iOS Safari, Android Chrome
-- [ ] **Deployment**: Vercel/Netlify deployment
-- [ ] **Domain Setup**: Custom domain configuration
-- [ ] **Analytics**: Basic usage analytics (optional)
-
-### Documentation
-- [ ] **README Update**: Complete project documentation
-- [ ] **API Documentation**: Component API documentation
-- [ ] **User Guide**: How-to guide for users
-- [ ] **Developer Guide**: Setup and contribution guide
-
----
-
-## 📋 **IMPLEMENTATION GUIDE**
-
-### For New Features
-
-1. **Create Feature Branch**:
-   ```bash
-   git checkout -b feature/command-palette
-   # or
-   git checkout -b feature/responsive-design
-   ```
-
-2. **Implementation Checklist**:
-   - [ ] Add TypeScript interfaces
-   - [ ] Create component(s)
-   - [ ] Add to Zustand store if needed
-   - [ ] Update tests (if applicable)
-   - [ ] Update documentation
-   - [ ] Test thoroughly
-
-3. **Code Standards**:
-   - Use TypeScript for all new code
-   - Follow existing component patterns
-   - Use shadcn/ui components when possible
-   - Maintain dark mode compatibility
-   - Add proper error handling
-
-### Branch Naming Convention
-- `feature/command-palette` - New features
-- `fix/drag-drop-issue` - Bug fixes
-- `enhancement/responsive-design` - Improvements
-- `docs/readme-update` - Documentation
-
----
-
-## 🎯 **CURRENT FOCUS**
-
-### Immediate Next Steps
-1. **Multi-Project System**: Implement project management and multiple view types
-2. **Responsive Design**: Mobile-first responsive implementation
-3. **Deployment**: Production build and deployment
-4. **Final Testing**: Cross-browser and mobile testing
-5. **Documentation**: Complete user and developer guides
-
-### Future Vision
-The multi-project system will transform DoToo from a single-project task manager into a comprehensive project management platform, supporting different workflows and team needs through various view types and project-specific configurations.
-
-### Success Metrics
-- ✅ **Core Functionality**: 100% Complete
-- ✅ **Developer Experience**: 95% Complete
-- ✅ **UI/UX Quality**: 90% Complete
-- 🔄 **Responsive Design**: 0% Complete
-- 🔄 **Production Ready**: 80% Complete
-
----
-
-## 🏆 **ACHIEVEMENTS**
-
-### Major Milestones Reached
-- ✅ **MVP Complete**: All core features working
-- ✅ **Developer-Focused**: Monaco Editor, Git integration
-- ✅ **Professional UI**: VS Code-inspired design
-- ✅ **Advanced Search**: Comprehensive filtering system
-- ✅ **Production Quality**: 95% feature complete
-
-### Technical Excellence
-- ✅ **TypeScript**: Full type safety
-- ✅ **Modern Stack**: React 18, Vite, Tailwind, Zustand
-- ✅ **Performance**: Optimized drag & drop, efficient rendering
-- ✅ **Accessibility**: Proper ARIA labels, keyboard navigation
-- ✅ **Code Quality**: Clean, maintainable architecture
-
----
-
-**Project Status**: 🎉 **98% Complete - Almost Production Ready!**
-**Next Branch**: `feature/responsive-design` or `feature/deployment` 
+Key architectural decisions:
+- Multi-project system for organizing different types of work
+- View-based architecture allowing different perspectives on the same data
+- Consistent drag and drop experience across Kanban and Calendar views
+- Type-safe development with comprehensive TypeScript coverage
+- Performance-optimized state management with Zustand
+- Responsive design supporting both desktop and mobile workflows 
